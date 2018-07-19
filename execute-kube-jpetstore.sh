@@ -48,6 +48,9 @@ if [ "$INTERACTIVE" == "no" ] ; then
 	checkFile log-configuration $BASE_DIR/log4j.cfg
 fi
 
+checkFile jpetstore-configuration $KUBERNETES_DIR/jpetstore.yaml
+checkFile usa-configuration $KUBERNETES_DIR/usa.yaml
+
 ###################################
 # check if no leftovers are running
 
