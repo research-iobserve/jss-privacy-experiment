@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: account
+spec:
+  replicas: %ACCOUNT-INSTANCES%
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: account
+    spec:
+      containers:
+      - image: blade1.se.internal:5000/jpetstore-account-service
+        name: account
+        resources: {}
+        env:
+        - name: LOGGER
+          value: %LOGGER%
+      restartPolicy: Always
+status: {}
