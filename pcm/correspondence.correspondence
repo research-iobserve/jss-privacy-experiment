@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ASCII"?>
+<correspondence:CorrespondenceModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xmlns:correspondence="https://www.iobserve-devops.net/model/0.0.3/correspondence">
+  <parts>
+    <modelType href="assembly.system#_Q1a_gAA3EeiMaMdqfMnouQ"/>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-frontend-service">
+      <assembly href="assembly.system#_ZvkQAAA3EeiMaMdqfMnouQ"/>
+    </entries>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-account-service">
+      <assembly href="assembly.system#_ciOk4AA3EeiMaMdqfMnouQ"/>
+    </entries>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-catalog-service">
+      <assembly href="assembly.system#_dK2EEAA3EeiMaMdqfMnouQ"/>
+    </entries>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-order-service">
+      <assembly href="assembly.system#_d_PVcAA3EeiMaMdqfMnouQ"/>
+    </entries>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-account-database">
+      <assembly href="assembly.system#_eyO4oAA3EeiMaMdqfMnouQ"/>
+    </entries>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-catalog-database">
+      <assembly href="assembly.system#_gXuPwAA3EeiMaMdqfMnouQ"/>
+    </entries>
+    <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-order-database">
+      <assembly href="assembly.system#_hL0mMAA3EeiMaMdqfMnouQ"/>
+    </entries>
+  </parts>
+</correspondence:CorrespondenceModel>

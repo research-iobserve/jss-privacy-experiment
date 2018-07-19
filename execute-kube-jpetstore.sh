@@ -17,24 +17,15 @@ fi
 #############################################
 # common functions
 
-# stopping docker container
-function stopDocker() {
+function stopKube() {
 	information "Stopping existing distributed jpetstore instances ..."
 
-	docker stop frontend
-	docker stop order
-	docker stop catalog
-	docker stop account
-	
-	docker rm frontend
-	docker rm order
-	docker rm catalog
-	docker rm account
-
-	docker network rm jpetstore-net
-
-	information "done"
+	kubectl delete --grace-period=60 service/jpetstore
+	for I in frontend account catalog order ; do
+		kubectl delete --grace-period=120 pods/$I
+	done
 }
+
 
 ###################################
 # check parameters
@@ -60,8 +51,6 @@ fi
 ###################################
 # check if no leftovers are running
 
-# stop docker
-stopDocker
 
 ###################################
 # starting
@@ -70,15 +59,20 @@ stopDocker
 
 information "Start jpetstore"
 
-docker network create --driver bridge jpetstore-net
+# initial deployment
+cat $KUBERNETES_DIR/jpetstore.yaml | sed "s/%LOGGER%/$LOGGER/g" > start.yaml
+cat $KUBERNETES_DIR/usa.yaml | sed "s/%LOGGER%/$LOGGER/g" > additional.yaml
+kubectl create -f start.yaml
 
-docker run -e LOGGER=$LOGGER -d --name account --network=jpetstore-net jpetstore-account-service
-docker run -e LOGGER=$LOGGER -d --name order --network=jpetstore-net jpetstore-order-service
-docker run -e LOGGER=$LOGGER -d --name catalog --network=jpetstore-net jpetstore-catalog-service
-docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstore-frontend-service
+rm start.yaml
 
-ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
-FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
+# check if service is running
+
+FRONTEND=""
+while [ "$FRONTEND" == "" ] ; do
+	ID=`kubectl get pods | grep frontend | awk '{ print $1 }'`
+	FRONTEND=`kubectl describe pods/$ID | grep "IP:" | awk '{ print $2 }'`
+done
 
 SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
 
@@ -97,16 +91,35 @@ else
 	information "Running workload driver"
 
         export SELENIUM_EXPERIMENT_WORKLOADS_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg
-        $WORKLOAD_RUNNER -c $WORKLOAD_PATH -u "$SERVICE_URL" -d "$WEB_DRIVER"
+        $WORKLOAD_RUNNER -c $WORKLOAD_PATH -u "$SERVICE_URL" -d "$WEB_DRIVER" &
+	WORKLOAD_RUNNER_PID=$!
 
         sleep 10	
 fi
-	
-###################################
-# shutdown
+
+# delay
+information "Wait for deployment change"
+sleep 30
+
+# modification
+information "Perform deployment change"
+kubectl replace -f additional.yaml --force
+
+# wait for scenario end
+information "Wait for scenario end"
+wait $WORKLOAD_RUNNER_PID
+
 
 # shutdown jpetstore
-stopDocker
+stopKube
 
+sleep 120
+
+# shutdown analysis/collector
+information "Term Analysis"
+
+kill -TERM ${COLLECTOR_PID}
+rm collector.config
+
+information "Done."
 # end
-
