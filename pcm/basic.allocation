@@ -2,4 +2,16 @@
 <allocation:Allocation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:allocation="http://palladiosimulator.org/PalladioComponentModel/Allocation/5.2" id="_QXdJwAA6EeiMaMdqfMnouQ" entityName="JPetStore-Allocation">
   <targetResourceEnvironment_Allocation href="basic.resourceenvironment#/"/>
   <system_Allocation href="assembly.system#_Q1a_gAA3EeiMaMdqfMnouQ"/>
+  <allocationContexts_Allocation id="_xLwtUAA6EeiMaMdqfMnouQ" entityName="Allocation_Assembly_AccountDatabase">
+    <resourceContainer_AllocationContext href="basic.resourceenvironment#_slzBEAA1EeiMaMdqfMnouQ"/>
+    <assemblyContext_AllocationContext href="assembly.system#_eyO4oAA3EeiMaMdqfMnouQ"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_xlifQAA6EeiMaMdqfMnouQ" entityName="Allocation_Assembly_OrderDatabase">
+    <resourceContainer_AllocationContext href="basic.resourceenvironment#_slzBEAA1EeiMaMdqfMnouQ"/>
+    <assemblyContext_AllocationContext href="assembly.system#_hL0mMAA3EeiMaMdqfMnouQ"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_x2H48AA6EeiMaMdqfMnouQ" entityName="Allocation_Assembly_CatalogDatabase">
+    <resourceContainer_AllocationContext href="basic.resourceenvironment#_slzBEAA1EeiMaMdqfMnouQ"/>
+    <assemblyContext_AllocationContext href="assembly.system#_gXuPwAA3EeiMaMdqfMnouQ"/>
+  </allocationContexts_Allocation>
 </allocation:Allocation>
