@@ -79,7 +79,7 @@ iobserve.analysis.privacy.probeControls=localhost:4321
 
 EOF
 
-export SERVICE_PRIVACY_VIOLATION_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg
+export SERVICE_PRIVACY_VIOLATION_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j-debug.cfg
 ${PRIVACY_ANALYSIS} -c privacy.config
 
 # end
