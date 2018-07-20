@@ -25,7 +25,7 @@ function stopDocker() {
 	docker stop order
 	docker stop catalog
 	docker stop account
-	
+
 	docker rm frontend
 	docker rm order
 	docker rm catalog
