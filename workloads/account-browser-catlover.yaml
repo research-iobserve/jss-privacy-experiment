@@ -2,7 +2,7 @@
 ---
 activityDelay: 1
 webDriverConfiguration:
-  baseUrl: http://172.17.0.2:8080/jpetstore/
+  baseUrl: http://172.18.0.5:8080/jpetstore-frontend/
   type: org.iobserve.selenium.behavior.ChromeDriverFactory
   driver: /home/reiner/Projects/iObserve/experiments/tools/chromedriver
   timeout: 60000
@@ -20,6 +20,12 @@ workloads:
       name: BrowsingUser
       spawnPerSecond: 0.2
       durations: [ 200 ]
+  - name: CatLoverBehavior
+    intensity:
+      type: org.iobserve.selenium.configuration.ConstantWorkloadIntensity
+      name: CatLoverBehavior
+      spawnPerSecond: 0.3
+      durations: [ 50 ]
 behaviors:
   AccountManager:
     name: AccountManager
@@ -62,8 +68,8 @@ behaviors:
       - name: AddCatsToCartTask
         repetition: { min: 1, max: 10 }
         parameters:
-          amountOfCat: 9
-          catPosition: 0
+          amount: 9
+          itemPosition: 0
       - name: LoginJPetStoreTask
         parameters:
           username: j2ee

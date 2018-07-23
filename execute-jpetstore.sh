@@ -80,7 +80,7 @@ docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstor
 ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
 FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
-SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
+SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend/"
 
 information "Service URL $SERVICE_URL"
 
