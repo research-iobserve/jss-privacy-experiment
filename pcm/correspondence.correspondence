@@ -26,4 +26,9 @@
       <assembly href="assembly.system#_hL0mMAA3EeiMaMdqfMnouQ"/>
     </entries>
   </parts>
+  <parts>
+    <modelType href="jpetstore.repository#_zUW8gJk3Eeer_6_V0MXTNA"/>
+    <entries xsi_type="correspondence:ComponentEntry" implementationId="">
+      <component href="jpetstore.repository#...."/>
+  </parts>
 </correspondence:CorrespondenceModel>
