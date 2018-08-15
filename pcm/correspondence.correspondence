@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="ASCII"?>
 <correspondence:CorrespondenceModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" 
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-   xmlns:correspondence="https://www.iobserve-devops.net/model/0.0.3/correspondence">
+   xmlns:correspondence="https://www.iobserve-devops.net/model/0.0.3/correspondence"
+    xmlns:repository="http://palladiosimulator.org/PalladioComponentModel/Repository/5.2">
+
   <parts>
     <modelType href="assembly.system#_Q1a_gAA3EeiMaMdqfMnouQ"/>
     <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-frontend-service">
@@ -28,7 +30,27 @@
   </parts>
   <parts>
     <modelType href="jpetstore.repository#_zUW8gJk3Eeer_6_V0MXTNA"/>
-    <entries xsi_type="correspondence:ComponentEntry" implementationId="">
-      <component href="jpetstore.repository#...."/>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.service.FrontendService">
+      <component href="jpetstore.repository#_koqHoJk4Eeer_6_V0MXTNA" xsi:type="repository:BasicComponent"/>
+    </entries>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.service.AccountService">
+      <component href="jpetstore.repository#_ZpyJ0Jk5Eeer_6_V0MXTNA" xsi:type="repository:BasicComponent"/>
+    </entries>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.service.CatalogService">
+      <component href="jpetstore.repository#_b7wzgJk5Eeer_6_V0MXTNA" xsi:type="repository:BasicComponent"/>
+    </entries>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.service.OrderService">
+      <component href="jpetstore.repository#_lsiKAJk5Eeer_6_V0MXTNA" xsi:type="repository:BasicComponent"/>
+    </entries>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.database.AccountDatabase">
+      <component href="jpetstore.repository#_66nsENqaEeeIEPEbplhj7g" xsi:type="repository:BasicComponent"/>
+    </entries>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.database.CatalogDatabase">
+      <component href="jpetstore.repository#_vuR_adquEeeIEPEbplhj7g" xsi:type="repository:BasicComponent"/>
+    </entries>
+    <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.database.OrderDatabase">
+      <component href="jpetstore.repository#_-67vydquEeeIEPEbplhj7g" xsi:type="repository:BasicComponent"/>
+    </entries>
   </parts>
+
 </correspondence:CorrespondenceModel>
