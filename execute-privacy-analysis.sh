@@ -4,8 +4,6 @@
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
-. $BASE_DIR/common-functions.sh
-
 if [ -f $BASE_DIR/config ] ; then
 	. $BASE_DIR/config
 else
@@ -13,46 +11,27 @@ else
 	exit 1
 fi
 
-#########################################
-# parameter evaluation
+. $BASE_DIR/common-functions.sh
 
-if [ "$1" == "" ] ; then
-	error "Usage: $0 <EXPERIMENT ID>"
-	exit 1
-fi
+JPETSTORE="$BASE_DIR/execute-jpetstore.sh"
 
-export EXPERIMENT_ID="$1"
-export INPUT_DATA_DIR="${DATA_DIR}/${EXPERIMENT_ID}"
+###################################
+# check setup
 
-# compute setup
-if [ -f $INPUT_DATA_DIR/kieker.map ] ; then
-	KIEKER_DIRECTORIES=$INPUT_DATA_DIR
-else
-	KIEKER_DIRECTORIES=""
-	for D in `ls $INPUT_DATA_DIR` ; do
-		if [ -f $INPUT_DATA_DIR/$D/kieker.map ] ; then
-			if [ "$KIEKER_DIRECTORIES" == "" ] ;then
-				KIEKER_DIRECTORIES="$INPUT_DATA_DIR/$D"
-			else
-				KIEKER_DIRECTORIES="$KIEKER_DIRECTORIES:$INPUT_DATA_DIR/$D"
-			fi
-		else
-			error "$INPUT_DATA_DIR/$D is not a kieker log directory."
-			exit 1
-		fi
-	done
-fi
+checkExecutable JPetStore "${JPETSTORE}"
+checkFile log-configuration "${BASE_DIR}/log4j.cfg"
+checkDirectory "data directory" "${DATA_DIR}"
+checkExecutable "Privacy Analysis" "${PRIVACY_ANALYSIS}"
 
-information "Kieker directories $KIEKER_DIRECTORIES"
+###################################
+# start experiment
 
-#########################################
-# check tools
+information "Deploying experiment..."
 
-checkExecutable privacy-analysis "${PRIVACY_ANALYSIS}"
-checkDirectory input "${INPUT_DATA_DIR}"
+##
+# Privacy Analysis
 
-#########################################
-# run analysis
+information "Start privacy analysis"
 
 cat << EOF > privacy.config
 ## The name of the Kieker instance.
@@ -60,9 +39,10 @@ kieker.monitoring.name=${EXPERIMENT_ID}
 kieker.monitoring.hostname=
 kieker.monitoring.metadata=true
 
-# reader
-iobserve.analysis.source=org.iobserve.service.source.FileSourceCompositeStage
-org.iobserve.service.source.FileSourceCompositeStage.sourceDirectories=${KIEKER_DIRECTORIES}
+# TCP collector
+iobserve.service.reader=org.iobserve.service.source.MultipleConnectionTcpCompositeStage
+org.iobserve.service.source.MultipleConnectionTcpCompositeStage.port=9876
+org.iobserve.service.source.MultipleConnectionTcpCompositeStage.capacity=8192
 
 # data storage
 iobserve.analysis.model.pcm.databaseDirectory=$DB_DIR
@@ -80,7 +60,23 @@ iobserve.analysis.privacy.probeControls=localhost:4321
 EOF
 
 export SERVICE_PRIVACY_VIOLATION_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j-debug.cfg
-${PRIVACY_ANALYSIS} -c privacy.config
+${PRIVACY_ANALYSIS} -c privacy.config &
+ANALYSIS_PID=$!
+
+sleep 10
+
+# run jpetstore
+$JPETSTORE "${WORKLOAD_CONFIGURATION}"
+
+# finally stop the collector
+information "Stopping privacy analysis"
+
+kill -TERM ${ANALYSIS_PID}
+rm privacy.config
+
+wait ${ANALYSIS_PID}
+
+information "Experiment complete."
 
 # end
 
