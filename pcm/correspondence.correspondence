@@ -51,5 +51,60 @@
     <entries xsi:type="correspondence:ComponentEntry" implementationId="org.mybatis.jpetstore.database.OrderDatabase">
       <component href="jpetstore.repository#_-67vydquEeeIEPEbplhj7g" xsi:type="repository:BasicComponent"/>
     </entries>
+    
+    <entries xsi:type="correspondence:OperationEntry" implementationId="insertAccount(account)">
+      <operation href="jpetstore.repository#_bt2ocJk7Eeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="updateAccount(account)">
+      <operation href="jpetstore.repository#_fDROoJlHEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="userRequest(username,password)">
+      <operation href="jpetstore.repository#_48h2MJlIEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="getCategoryList()">
+      <operation href="jpetstore.repository#_vBvEMJlMEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="getCategoryById(id)">
+      <operation href="jpetstore.repository#_5ZneAJlMEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="itemInStock(id)">
+      <operation href="jpetstore.repository#_X9jsAJlOEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="itemListByProduct(productId)">
+      <operation href="jpetstore.repository#_3ULwoJlOEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="itemById(itemId)">
+      <operation href="jpetstore.repository#_tz-JMJlPEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="productListByCategory(categoryId)">
+      <operation href="jpetstore.repository#_7r00YJlQEeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="productById(productId)">
+      <operation href="jpetstore.repository#_XKVX8JlREeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="searchProductList(keywords)">
+      <operation href="jpetstore.repository#_hH-FwJlREeer_6_V0MXTNA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="insertOrder(order)">
+      <operation href="jpetstore.repository#_m1eF8JoTEeelXf12NKUrpA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="nextId(name)">
+      <operation href="jpetstore.repository#_qa5fEJoUEeelXf12NKUrpA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="orderById(orderId)">
+      <operation href="jpetstore.repository#__7-a4JoUEeelXf12NKUrpA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="ordersByUsername(username)">
+      <operation href="jpetstore.repository#_HG_aoJoWEeelXf12NKUrpA" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="applySQLStatement(sqlStatement)">
+      <operation href="jpetstore.repository#_ggIwUNqlEeeIEPEbplhj7g" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="applySQLStatement(sqlStatement)">
+      <operation href="jpetstore.repository#_gZ85sNquEeeIEPEbplhj7g" xsi:type="repository:OperationSignature"/>
+    </entries>
+    <entries xsi:type="correspondence:OperationEntry" implementationId="applySQLStatement(sqlStatement)">
+      <operation href="jpetstore.repository#_qL-NYNquEeeIEPEbplhj7g" xsi:type="repository:OperationSignature"/>
+    </entries>
   </parts>
 </correspondence:CorrespondenceModel>
