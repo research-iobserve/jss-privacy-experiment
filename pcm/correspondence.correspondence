@@ -2,7 +2,8 @@
 <correspondence:CorrespondenceModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" 
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
    xmlns:correspondence="https://www.iobserve-devops.net/model/0.0.3/correspondence"
-    xmlns:repository="http://palladiosimulator.org/PalladioComponentModel/Repository/5.2">
+    xmlns:repository="http://palladiosimulator.org/PalladioComponentModel/Repository/5.2"
+    xmlns:allocation="http://palladiosimulator.org/PalladioComponentModel/Allocation/5.2">
 
   <parts>
     <modelType href="assembly.system#_Q1a_gAA3EeiMaMdqfMnouQ"/>
@@ -26,6 +27,18 @@
     </entries>
     <entries xsi:type="correspondence:AssemblyEntry" implementationId="jpetstore-order-database">
       <assembly href="assembly.system#_hL0mMAA3EeiMaMdqfMnouQ"/>
+    </entries>
+  </parts>
+  <parts>
+    <modelType href="basic.allocation#_QXdJwAA6EeiMaMdqfMnouQ"/>
+    <entries xsi:type="correspondence:AllocationEntry" implementationId="db://localhost:5432/account-database/" technology="DB">
+        <allocation href="basic.allocation#_xLwtUAA6EeiMaMdqfMnouQ" xsi:type="allocation:AllocationContext"/>
+    </entries>
+    <entries xsi:type="correspondence:AllocationEntry" implementationId="db://localhost:5432/order-database/" technology="DB">
+        <allocation href="basic.allocation#_xlifQAA6EeiMaMdqfMnouQ" xsi:type="allocation:AllocationContext"/>
+    </entries>
+    <entries xsi:type="correspondence:AllocationEntry" implementationId="db://localhost:5432/catalog-database/" technology="DB">
+        <allocation href="basic.allocation#_x2H48AA6EeiMaMdqfMnouQ" xsi:type="allocation:AllocationContext"/>
     </entries>
   </parts>
   <parts>
