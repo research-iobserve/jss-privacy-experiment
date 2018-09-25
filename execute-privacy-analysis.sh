@@ -35,12 +35,12 @@ information "Start privacy analysis"
 
 cat << EOF > privacy.config
 ## The name of the Kieker instance.
-kieker.monitoring.name=${EXPERIMENT_ID}
+kieker.monitoring.name="${EXPERIMENT_ID}"
 kieker.monitoring.hostname=
 kieker.monitoring.metadata=true
 
 # TCP collector
-iobserve.service.reader=org.iobserve.service.source.MultipleConnectionTcpCompositeStage
+iobserve.analysis.source=org.iobserve.service.source.MultipleConnectionTcpCompositeStage
 org.iobserve.service.source.MultipleConnectionTcpCompositeStage.port=9876
 org.iobserve.service.source.MultipleConnectionTcpCompositeStage.capacity=8192
 
@@ -51,6 +51,7 @@ iobserve.analysis.model.pcm.initializationDirectory=$PCM_DIR
 # privacy configuration
 iobserve.analysis.privacy.alarmFile=$BASE_DIR/alarms.txt
 iobserve.analysis.privacy.warningFile=$BASE_DIR/warnings.txt
+iobserve.analysis.privacy.modelDumpDirectory=$BASE_DIR/snapshots/
 
 iobserve.analysis.privacy.policyList=NoPersonalDataInUSAPolicy
 iobserve.analysis.privacy.packagePrefix=org.iobserve.service.privacy.violation.transformation.privacycheck.policies
@@ -66,7 +67,7 @@ ANALYSIS_PID=$!
 sleep 10
 
 # run jpetstore
-$JPETSTORE "${WORKLOAD_CONFIGURATION}"
+$JPETSTORE "$1"
 
 # finally stop the collector
 information "Stopping privacy analysis"
