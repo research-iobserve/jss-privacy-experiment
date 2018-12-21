@@ -13,8 +13,6 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
-JPETSTORE="$BASE_DIR/execute-jpetstore.sh"
-
 ###################################
 # check setup
 

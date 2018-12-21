@@ -20,6 +20,9 @@ LOGGER=192.168.48.213
 ##############
 ## executables
 
+# jpetsotre script
+JPETSTORE="$BASE_DIR/execute-jpetstore.sh"
+
 # iobserve analysis
 ANALYSIS="$TOOLS_DIR/analysis-0.0.3-SNAPSHOT/bin/analysis"
 

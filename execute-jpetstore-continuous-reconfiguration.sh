@@ -36,26 +36,7 @@ function stopDocker() {
 	information "done"
 }
 
-###################################
-# check parameters
-if [ "$1" == "" ] ; then
-	export INTERACTIVE="yes"
-	information "Interactive mode no specialized workload driver"
-else
-	export INTERACTIVE="no"
-	checkFile workload "$1"
-	WORKLOAD_PATH="$1"
-	information "Automatic mode, workload driver is ${WORKLOAD_PATH}"
-fi
-
-###################################
-# check setup
-
-if [ "$INTERACTIVE" == "no" ] ; then
-	checkExecutable workload-runner $WORKLOAD_RUNNER
-	checkExecutable wbe-driver $WEB_DRIVER
-	checkFile log-configuration $BASE_DIR/log4j.cfg
-fi
+information "Interactive mode no specialized workload driver"
 
 ###################################
 # check if no leftovers are running
@@ -72,7 +53,7 @@ information "Start jpetstore"
 
 docker network create --driver bridge jpetstore-net
 
-docker run -e LOGGER=$LOGGER -d --name account --network=jpetstore-net jpetstore-account-service
+docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account --network=jpetstore-net jpetstore-account-service
 docker run -e LOGGER=$LOGGER -d --name order --network=jpetstore-net jpetstore-order-service
 docker run -e LOGGER=$LOGGER -d --name catalog --network=jpetstore-net jpetstore-catalog-service
 docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstore-frontend-service
@@ -80,7 +61,7 @@ docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstor
 ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
 FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
-SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
+SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend/"
 
 information "Service URL $SERVICE_URL"
 
@@ -88,19 +69,22 @@ while ! curl -sSf $SERVICE_URL ; do
 	sleep 1
 done
 
-# check workload
-if [ "$INTERACTIVE" == "yes" ] ; then
-	information "You may now use JPetStore"
-	information "Press Enter to stop the service"
-	read
-else
-	information "Running workload driver"
+ITERATION=0
 
-        export SELENIUM_EXPERIMENT_WORKLOADS_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg
-        $WORKLOAD_RUNNER -c $WORKLOAD_PATH -u "$SERVICE_URL" -d "$WEB_DRIVER"
+while [ $ITERATION -lt 10000 ] ; do
+	ITERATION=`expr $ITERATION + 1`
+	echo "Redeployment $ITERATION"
 
-        sleep 10
-fi
+	if [ $(( $ITERATION % 2)) -eq 0 ]; then
+		export LOCATION="USA"
+	else
+		export LOCATION="GERMANY"
+	fi
+
+	docker stop account
+	docker rm account
+	docker run -e LOGGER=$LOGGER -e LOCATION=$LOCATION -d --name account --network=jpetstore-net jpetstore-account-service
+done
 
 ###################################
 # shutdown
