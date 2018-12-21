@@ -13,6 +13,12 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
+PRIVACY_ANALYSIS="$TOOLS_DIR/service.privacy.violation-0.0.3-SNAPSHOT/bin/service.privacy.violation"
+REPLAYER="$TOOLS_DIR/replayer-0.0.3-SNAPSHOT/bin/replayer"
+
+checkExecutable "privacy analysis" "${PRIVACY_ANALYSIS}"
+checkExecutable "replayer" "${REPLAYER}"
+
 ###################################
 
 information "Starting privacy analysis"
@@ -42,9 +48,9 @@ iobserve.analysis.privacy.packagePrefix=org.iobserve.service.privacy.violation.t
 iobserve.analysis.privacy.probeControls=localhost:4321
 EOF
 
-OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg -Dkieker.monitoring.configuration=$BASE_DIR/kieker.properties"
-$TOOLS_DIR/service.privacy.violation-0.0.3-SNAPSHOT/bin/service.privacy.violation -c $BASE_DIR/privacy.config &
-ANALYSIS_PID=$!
+SERVICE_PRIVACY_VIOLATION_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg -Dkieker.monitoring.configuration=$BASE_DIR/kieker.properties"
+${PRIVACY_ANALYSIS} -c $BASE_DIR/privacy.config &
+PRIVACY_ANALYSIS_PID=$!
 
 information "Wait for service to be started properly"
 sleep 60
@@ -53,12 +59,12 @@ information "Starting replayer"
 
 KIEKER=`ls $DATA_DIR | grep "kieker-"`
 
-OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
-$TOOLS_DIR/replayer-0.0.3-SNAPSHOT/bin/replayer -p 9876 -i $DATA_DIR/$KIEKER/  -h localhost -r -c 100 -d 4
+REPLAYER_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
+${REPLAYER} -p 9876 -i $DATA_DIR/$KIEKER/  -h localhost -r -c 100 -d 4
 
-kill -TERM $ANALYSIS_PID
+kill -TERM $PRIVACY_ANALYSIS_PID
 sleep 10
-kill -9 $ANALYSIS_PID
+kill -9 $PRIVACY_ANALYSIS_PID
 
 rm $BASE_DIR/privacy.config
 
