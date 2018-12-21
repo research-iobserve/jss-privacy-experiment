@@ -13,6 +13,10 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
+EVAL_PERFORMANCE="$TOOLS_DIR/evaluate-jss-performance-0.0.3-SNAPSHOT/bin/evaluate-jss-performance"
+
+checkExecutable "Performance evaluation" "${EVAL_PERFORMANCE}"
+
 ###################################
 
 # remove all logs
@@ -45,7 +49,8 @@ kieker.analysisteetime.plugin.reader.filesystem.LogsReaderCompositeStage.logDire
 org.iobserve.evaluate.jss.EvaluateMain.outputFile=jss-result-$LOOP.csv
 EOF
 	# execute evaluation
-	$TOOLS_DIR/evaluate-jss-performance-0.0.3-SNAPSHOT/bin/evaluate-jss-performance -c $BASE_DIR/eval.config
+	EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
+	${EVAL_PERFORMANCE} -c $BASE_DIR/eval.config
 	LOOP=`expr $LOOP + 1`
 done
 
