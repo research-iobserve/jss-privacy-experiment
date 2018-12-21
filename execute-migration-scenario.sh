@@ -31,11 +31,11 @@ LOOP=0
 while [ "$LOOP" != "1000" ] ; do
 	# execute privacy analysis
 	$BASE_DIR/execute-analysis.sh
-	
+
 	KIEKER=`ls "$DATA_DIR/privacy/"`
 	KIEKER_DIR="$DATA_DIR/privacy/$KIEKER"
 
-	# configure evaluation	
+	# configure evaluation
 	cat << EOF > $BASE_DIR/eval.config
 ## The name of the Kieker instance.
 kieker.monitoring.name=EXP
