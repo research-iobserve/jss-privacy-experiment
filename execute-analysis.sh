@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# run privacy analysis based on observed and logged events.
+
 # execute setup
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
@@ -27,6 +29,9 @@ PRIVACY_KIEKER_PROPERTIES=$BASE_DIR/privacy.kieker.properties
 
 mkdir $DATA_DIR/privacy
 
+##
+## configuration for monitoring the privacy analysis
+##
 cat << EOF > ${PRIVACY_KIEKER_PROPERTIES}
 kieker.monitoring.name=KIEKER
 kieker.monitoring.debug=false
@@ -64,6 +69,10 @@ kieker.monitoring.writer.filesystem.BinaryFileWriter.bufferSize=8192
 kieker.monitoring.writer.filesystem.BinaryFileWriter.compression=kieker.monitoring.writer.filesystem.compression.NoneCompressionFilter
 EOF
 
+
+##
+## configuration of the privacy analysis
+##
 cat << EOF > $BASE_DIR/privacy.config
 ## The name of the Kieker instance.
 kieker.monitoring.name=EXP
@@ -89,6 +98,9 @@ iobserve.analysis.privacy.packagePrefix=org.iobserve.service.privacy.violation.t
 iobserve.analysis.privacy.probeControls=localhost:4321
 EOF
 
+##
+## running privacy analysis
+##
 SERVICE_PRIVACY_VIOLATION_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg -Dkieker.monitoring.configuration=${PRIVACY_KIEKER_PROPERTIES}"
 ${PRIVACY_ANALYSIS} -c $BASE_DIR/privacy.config &
 PRIVACY_ANALYSIS_PID=$!
@@ -100,6 +112,9 @@ information "Starting replayer"
 
 KIEKER=`ls $DATA_DIR | grep "kieker-"`
 
+##
+## running event replayer
+##
 REPLAYER_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
 ${REPLAYER} -p 9876 -i $DATA_DIR/$KIEKER/  -h localhost -r -c 100 -d 4
 
