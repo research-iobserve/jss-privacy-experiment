@@ -65,13 +65,14 @@ SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend/"
 
 information "Service URL $SERVICE_URL"
 
-while ! curl -sSf $SERVICE_URL ; do
+while ! curl -sSf $SERVICE_URL 2> /dev/null > /dev/null ; do
+	echo "wait for service coming up..."
 	sleep 1
 done
 
 ITERATION=0
 
-while [ $ITERATION -lt 10000 ] ; do
+while [ $ITERATION -lt 10 ] ; do
 	ITERATION=`expr $ITERATION + 1`
 	echo "Redeployment $ITERATION"
 
@@ -81,9 +82,19 @@ while [ $ITERATION -lt 10000 ] ; do
 		export LOCATION="GERMANY"
 	fi
 
-	docker stop account
-	docker rm account
-	docker run -e LOGGER=$LOGGER -e LOCATION=$LOCATION -d --name account --network=jpetstore-net jpetstore-account-service
+	docker stop -t 30 account > /dev/null
+	docker rm account > /dev/null
+	docker run -e LOGGER=$LOGGER -e LOCATION=$LOCATION -d --name account --network=jpetstore-net jpetstore-account-service > /dev/null
+
+	ACCOUNT_ID=`docker ps | grep 'account' | awk '{ print $1 }'`
+	ACCOUNT=`docker inspect $ACCOUNT_ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
+
+	ACCOUNT_URL="http://$ACCOUNT:8080/jpetstore-account/request-user?username=j2ee"
+
+	while ! curl -sSf $ACCOUNT_URL 2> /dev/null > /dev/null ; do
+		echo "wait for service coming up..."
+		sleep 1
+	done
 done
 
 ###################################

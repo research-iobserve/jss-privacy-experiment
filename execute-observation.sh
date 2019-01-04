@@ -52,8 +52,13 @@ information "-------------------------------------------------------------------
 # stop collector
 information "Stopping collector ..."
 
-COLLECTOR_PID=`ps auxw | grep "/collector" | awk '{ print $2 }'`
-kill -TERM $COLLECTOR_PID
+COLLECTOR_PID=`ps auxw | grep "/collector" | grep -v grep | awk '{ print $2 }' | head -1`
+
+while  [ "${COLLECTOR_PID}" != "" ] ; do
+	COLLECTOR_PID=`ps auxw | grep "/collector" | grep -v grep | awk '{ print $2 }' | head -1`
+	echo "stopping ${COLLECTOR_PID}"
+	kill -TERM $COLLECTOR_PID
+done
 
 information "done"
 echo ""

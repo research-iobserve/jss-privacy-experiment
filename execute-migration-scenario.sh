@@ -20,20 +20,24 @@ checkExecutable "Performance evaluation" "${EVAL_PERFORMANCE}"
 ###################################
 
 # remove all logs
-rm -rf $DATA_DIR/kieker-*
+#rm -rf $DATA_DIR/kieker-*
 
 # create logs
-$BASE_DIR/execute-observation.sh
+#$BASE_DIR/execute-observation.sh
+
+EXECUTION_DIR="${BASE_DIR}/executions"
 
 LOOP=0
 
 # repeat analysis
 while [ "$LOOP" != "1000" ] ; do
 	# execute privacy analysis
-	$BASE_DIR/execute-analysis.sh
+	$BASE_DIR/execute-analysis.sh "${LOOP}"
 
-	KIEKER=`ls "$DATA_DIR/privacy/"`
-	KIEKER_DIR="$DATA_DIR/privacy/$KIEKER"
+	KIEKER_BASE_DIR="${EXECUTION_DIR}/${LOOP}/privacy-result"
+
+	KIEKER=`ls "${KIEKER_BASE_DIR}/"`
+	KIEKER_DIR="${KIEKER_BASE_DIR}/${KIEKER}"
 
 	# configure evaluation
 	cat << EOF > $BASE_DIR/eval.config
