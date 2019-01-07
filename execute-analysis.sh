@@ -26,10 +26,10 @@ REPLAYER="$TOOLS_DIR/replayer-0.0.3-SNAPSHOT/bin/replayer"
 ID="executions/$1"
 EXECUTION_DIR="${BASE_DIR}/${ID}"
 PRIVACY_MEASUREMENTS_DIR="${EXECUTION_DIR}/privacy-result"
-INPUT_DIR="${DATA_IDR}/input"
 
 checkExecutable "privacy analysis" "${PRIVACY_ANALYSIS}"
 checkExecutable "replayer" "${REPLAYER}"
+checkDirectory "input directory" "${INPUT_DIR}"
 
 ###################################
 
@@ -129,7 +129,7 @@ KIEKER=`ls "${INPUT_DIR}/" | grep "kieker-"`
 ## running event replayer
 ##
 REPLAYER_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j.cfg"
-${REPLAYER} -p 9876 -i "${INPUT_DIR}/"  -h localhost -r -c 100 -d 4
+${REPLAYER} -p 9876 -i "${INPUT_DIR}/${KIEKER}"  -h localhost -r -c 100 -d 4
 
 kill -TERM $PRIVACY_ANALYSIS_PID
 sleep 10

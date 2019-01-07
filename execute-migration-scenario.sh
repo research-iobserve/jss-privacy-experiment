@@ -22,19 +22,22 @@ checkExecutable "Performance evaluation" "${EVAL_PERFORMANCE}"
 # remove all logs
 #rm -rf $DATA_DIR/kieker-*
 
-# create logs
-#$BASE_DIR/execute-observation.sh
-
 EXECUTION_DIR="${BASE_DIR}/executions"
+
+# create logs
+# deactivated as docker images are not available for raspberry pi
+#$BASE_DIR/execute-observation.sh
 
 LOOP=0
 
 # repeat analysis
 while [ "$LOOP" != "1000" ] ; do
+	information "Analysis run $LOOP"
 	# execute privacy analysis
 	$BASE_DIR/execute-analysis.sh "${LOOP}"
 
 	KIEKER_BASE_DIR="${EXECUTION_DIR}/${LOOP}/privacy-result"
+	EXECUTION_RESULTS_DIR="${EXECUTION_DIR}/${LOOP}/performance-results"
 
 	KIEKER=`ls "${KIEKER_BASE_DIR}/"`
 	KIEKER_DIR="${KIEKER_BASE_DIR}/${KIEKER}"
@@ -50,7 +53,7 @@ kieker.monitoring.metadata=true
 iobserve.analysis.source=org.iobserve.service.source.GenericFileSourceCompositeStage
 kieker.analysisteetime.plugin.reader.filesystem.LogsReaderCompositeStage.logDirectories=$KIEKER_DIR/
 
-org.iobserve.evaluate.jss.EvaluateMain.outputFile=jss-result-$LOOP.csv
+org.iobserve.evaluate.jss.EvaluateMain.outputFile=${EXECUTION_RESULTS_DIR}/execution-$LOOP.csv
 EOF
 	# execute evaluation
 	EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"

@@ -7,6 +7,7 @@ FIXED_DIR="$BASE_DIR/fixed"
 PCM_DIR="$BASE_DIR/pcm"
 DB_DIR="$BASE_DIR/db"
 ANALYSIS_DIR="$BASE_DIR/analysis"
+INPUT_DIR="${DATA_DIR}/input"
 
 # analysis results
 RESULT_DIR="$BASE_DIR/results"
