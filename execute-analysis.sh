@@ -18,18 +18,30 @@ fi
 if [ "$1" == "" ] ; then
 	error "Missing experiment id"
 	exit 1
+else
+	EXPERIMENT_ID="$1"
+	information "Experiment $EXPERIMENT_ID"
+fi
+
+if [ "$2" == "" ] ; then
+	error "Missing iteration number"
+	exit 1
+else
+	ITERATION="$2"
+	information "Iteration $2"
 fi
 
 PRIVACY_ANALYSIS="$TOOLS_DIR/service.privacy.violation-0.0.3-SNAPSHOT/bin/service.privacy.violation"
 REPLAYER="$TOOLS_DIR/replayer-0.0.3-SNAPSHOT/bin/replayer"
 
-ID="executions/$1"
-EXECUTION_DIR="${BASE_DIR}/${ID}"
+EXECUTION_DIR="${BASE_DIR}/executions/${EXPERIMENT_ID}/${ITERATION}"
 PRIVACY_MEASUREMENTS_DIR="${EXECUTION_DIR}/privacy-result"
+
+INPUT_DIR="${DATA_DIR}/input/${EXPERIMENT_ID}"
 
 checkExecutable "privacy analysis" "${PRIVACY_ANALYSIS}"
 checkExecutable "replayer" "${REPLAYER}"
-checkDirectory "input directory" "${INPUT_DIR}"
+checkExecutable "input directory" "${INPUT_DIR}"
 
 ###################################
 
@@ -50,7 +62,7 @@ kieker.monitoring.name=KIEKER
 kieker.monitoring.debug=false
 kieker.monitoring.enabled=true
 kieker.monitoring.hostname=
-kieker.monitoring.initialExperimentId=1
+kieker.monitoring.initialExperimentId=${EXPERIMENT_ID}
 kieker.monitoring.metadata=true
 kieker.monitoring.setLoggingTimestamp=true
 kieker.monitoring.useShutdownHook=true

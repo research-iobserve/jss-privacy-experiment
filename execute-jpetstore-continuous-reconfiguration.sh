@@ -72,7 +72,7 @@ done
 
 ITERATION=0
 
-while [ $ITERATION -lt 10 ] ; do
+while [ $ITERATION -lt 10000 ] ; do
 	ITERATION=`expr $ITERATION + 1`
 	echo "Redeployment $ITERATION"
 
