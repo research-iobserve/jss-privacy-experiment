@@ -20,7 +20,6 @@ if [ "$1" == "" ] ; then
 	exit 1
 else
 	EXPERIMENT_ID="$1"
-	information "Experiment $EXPERIMENT_ID"
 fi
 
 if [ "$2" == "" ] ; then
@@ -28,8 +27,9 @@ if [ "$2" == "" ] ; then
 	exit 1
 else
 	ITERATION="$2"
-	information "Iteration $2"
 fi
+
+information "Running analysis for experiment $EXPERIMENT_ID, iteration $ITERATION"
 
 PRIVACY_ANALYSIS="$TOOLS_DIR/service.privacy.violation-0.0.3-SNAPSHOT/bin/service.privacy.violation"
 REPLAYER="$TOOLS_DIR/replayer-0.0.3-SNAPSHOT/bin/replayer"

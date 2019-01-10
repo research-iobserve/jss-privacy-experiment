@@ -33,8 +33,6 @@ ITERATION=0
 
 # repeat analysis
 while [ "$ITERATION" != "1000" ] ; do
-	information "Analysis run $ITERATION"
-
 	# execute privacy analysis
 	$BASE_DIR/execute-analysis.sh "${EXPERIMENT_ID}" "${ITERATION}"
 
