@@ -34,13 +34,13 @@ ITERATION=0
 # repeat analysis
 while [ "$ITERATION" != "1000" ] ; do
 	information "Analysis run $ITERATION"
-	
+
 	# execute privacy analysis
 	$BASE_DIR/execute-analysis.sh "${EXPERIMENT_ID}" "${ITERATION}"
 
 	KIEKER_BASE_DIR="${EXECUTION_DIR}/${ITERATION}/privacy-result"
 	EXECUTION_RESULTS_DIR="${EXECUTION_DIR}/${ITERATION}/performance-results"
-	
+
 	mkdir -p ${EXECUTION_RESULTS_DIR}
 
 	KIEKER=`ls "${KIEKER_BASE_DIR}/"`
