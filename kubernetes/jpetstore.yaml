@@ -43,6 +43,8 @@ spec:
     env:
     - name: LOGGER
       value: %LOGGER%
+    - name: LOCATION
+      value: %LOCATION%
 ---
 apiVersion: v1
 kind: Pod

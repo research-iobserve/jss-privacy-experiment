@@ -51,7 +51,7 @@ if [ "$INTERACTIVE" == "no" ] ; then
 fi
 
 checkFile jpetstore-configuration $KUBERNETES_DIR/jpetstore.yaml
-checkFile usa-configuration $KUBERNETES_DIR/usa.yaml
+checkFile usa-configuration $KUBERNETES_DIR/account-pod.yaml
 
 ###################################
 # check if no leftovers are running
@@ -67,8 +67,9 @@ information "Start jpetstore"
 # initial deployment
 export LOCATION="GERMANY"
 cat $KUBERNETES_DIR/jpetstore.yaml | sed "s/%LOGGER%/$LOGGER/g" | sed "s%LOCATION%/$LOCATION" > start.yaml
-cat $KUBERNETES_DIR/usa.yaml | sed "s/%LOGGER%/$LOGGER/g" | sed "s%LOCATION%/$LOCATION" > additional.yaml
+cat $KUBERNETES_DIR/account-pod.yaml | sed "s/%LOGGER%/$LOGGER/g" | sed "s%LOCATION%/$LOCATION" > additional.yaml
 kubectl create -f start.yaml
+kubectl create -f additional.yaml
 
 rm start.yaml
 
@@ -89,33 +90,28 @@ while ! curl -sSf $SERVICE_URL 2> /dev/null > /dev/null ; do
 	sleep 1
 done
 
-# check workload
-if [ "$INTERACTIVE" == "yes" ] ; then
-	information "You may now use JPetStore"
-	information "Press Enter to stop the service"
-	read
-else
-	information "Running workload driver"
+ITERATION=0
 
-        export SELENIUM_EXPERIMENT_WORKLOADS_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg
-        $WORKLOAD_RUNNER -c $WORKLOAD_PATH -u "$SERVICE_URL" -d "$WEB_DRIVER" &
-	WORKLOAD_RUNNER_PID=$!
+while [ $ITERATION -lt 10000 ] ; do
+	ITERATION=`expr $ITERATION + 1`
+	echo "Redeployment $ITERATION"
 
-        sleep 10	
-fi
+	if [ $(( $ITERATION % 2)) -eq 0 ]; then
+		export LOCATION="USA"
+	else
+		export LOCATION="GERMANY"
+	fi
 
-# delay
-information "Wait for deployment change"
-sleep 30
+	cat $KUBERNETES_DIR/account-pod.yaml | sed "s/%LOGGER%/$LOGGER/g" | sed "s%LOCATION%/$LOCATION" > additional.yaml
 
-# modification
-information "Perform deployment change"
-kubectl replace -f additional.yaml --force
+	kubectl replace -f additional.yaml --force
 
-# wait for scenario end
-information "Wait for scenario end"
-wait $WORKLOAD_RUNNER_PID
+	rm additional.yaml
 
+done
+
+###################################
+# shutdown
 
 # shutdown jpetstore
 stopKube
@@ -129,4 +125,6 @@ kill -TERM ${COLLECTOR_PID}
 rm collector.config
 
 information "Done."
+
 # end
+
