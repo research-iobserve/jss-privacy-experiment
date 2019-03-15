@@ -32,7 +32,7 @@ EXECUTION_DIR="${BASE_DIR}/executions/${EXPERIMENT_ID}"
 ITERATION=0
 
 # repeat analysis
-while [ "$ITERATION" != "1000" ] ; do
+while [ "$ITERATION" != "200" ] ; do
 	# execute privacy analysis
 	$BASE_DIR/execute-analysis.sh "${EXPERIMENT_ID}" "${ITERATION}"
 
