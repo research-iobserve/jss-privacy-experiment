@@ -33,19 +33,22 @@ ITERATION=0
 
 # repeat analysis
 while [ "$ITERATION" != "200" ] ; do
-	# execute privacy analysis
-	$BASE_DIR/execute-analysis.sh "${EXPERIMENT_ID}" "${ITERATION}"
+	if [ -d "${EXECUTION_DIR}/${ITERATION}" ] ; then
+		echo "Skipping existing run $ITERATION"
+	else
+		# execute privacy analysis
+		$BASE_DIR/execute-analysis.sh "${EXPERIMENT_ID}" "${ITERATION}"
 
-	KIEKER_BASE_DIR="${EXECUTION_DIR}/${ITERATION}/privacy-result"
-	EXECUTION_RESULTS_DIR="${EXECUTION_DIR}/${ITERATION}/performance-results"
+		KIEKER_BASE_DIR="${EXECUTION_DIR}/${ITERATION}/privacy-result"
+		EXECUTION_RESULTS_DIR="${EXECUTION_DIR}/${ITERATION}/performance-results"
 
-	mkdir -p ${EXECUTION_RESULTS_DIR}
+		mkdir -p ${EXECUTION_RESULTS_DIR}
 
-	KIEKER=`ls "${KIEKER_BASE_DIR}/"`
-	KIEKER_DIR="${KIEKER_BASE_DIR}/${KIEKER}"
+		KIEKER=`ls "${KIEKER_BASE_DIR}/"`
+		KIEKER_DIR="${KIEKER_BASE_DIR}/${KIEKER}"
 
-	# configure evaluation
-	cat << EOF > $BASE_DIR/eval.config
+		# configure evaluation
+		cat << EOF > $BASE_DIR/eval.config
 ## The name of the Kieker instance.
 kieker.monitoring.name=EXP
 kieker.monitoring.hostname=
@@ -57,9 +60,10 @@ kieker.analysisteetime.plugin.reader.filesystem.LogsReaderCompositeStage.logDire
 
 org.iobserve.evaluate.jss.EvaluateMain.outputFile=${EXECUTION_RESULTS_DIR}/execution-${ITERATION}.csv
 EOF
-	# execute evaluation
-	EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
-	${EVAL_PERFORMANCE} -c $BASE_DIR/eval.config
+		# execute evaluation
+		EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
+		${EVAL_PERFORMANCE} -c $BASE_DIR/eval.config
+	fi
 	ITERATION=`expr $ITERATION + 1`
 done
 
