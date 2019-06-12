@@ -26,13 +26,14 @@ declare -a SIMPID
 # initial set
 #for I in 1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90 100 200 300 400 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 ; do
 # additional long set
-# for I in 1 10 100 1000 10000 ; do
+for I in 1 10 100 1000 10000 ; do
 # additional edge cases
-for I in 11 12 13 14 15 95 110 120 130 140 150 550 560 570 580 590 710 720 730 740 750 950 960 970 980 990 1010 1020 1030 1040 1050 ; do
+#for I in 11 12 13 14 15 95 110 120 130 140 150 550 560 570 580 590 710 720 730 740 750 950 960 970 980 990 1010 1020 1030 1040 1050 ; do
 	information "Generating data for $I accounting nodes."
 
 #	EXPERIMENT_ID="simulated-account-services-long-$I"
-	EXPERIMENT_ID="simulated-account-services-$I"
+	EXPERIMENT_ID="simulated-account-services-med-$I"
+#	EXPERIMENT_ID="simulated-account-services-$I"
 	RESULT_DIR="${DATA_DIR}/input/${EXPERIMENT_ID}"
 
 	mkdir -p "${RESULT_DIR}"
@@ -77,13 +78,13 @@ EOF
         export SIMULATE_PETSTORE_OPTS="-Dkieker.monitoring.configuration=${BASE_DIR}/simulate-petstore-kieker.properties"
 
 #	${SIMULATOR} -l GERMANY,USA -i 1000000 -d 100 -a $I &
-	${SIMULATOR} -l GERMANY,USA -i 10000 -d 100 -a $I &
+	${SIMULATOR} -l GERMANY,USA -i 100000 -d 100 -a $I &
 	SIMPID[$I]=$!
 	sleep 10
 done
 
 for pid in ${SIMPID[@]}; do
-	echo "wati for $pid"
+	echo "wait for $pid"
 	wait $pid
 done
 
