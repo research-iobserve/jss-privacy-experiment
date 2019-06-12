@@ -53,7 +53,7 @@ fi
 
 if [ "$INTERACTIVE" == "no" ] ; then
 	checkExecutable workload-runner $WORKLOAD_RUNNER
-	checkExecutable wbe-driver $WEB_DRIVER
+	checkExecutable web-driver $WEB_DRIVER
 	checkFile log-configuration $BASE_DIR/log4j.cfg
 fi
 
