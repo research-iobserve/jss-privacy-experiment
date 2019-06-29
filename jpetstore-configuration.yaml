@@ -1,10 +1,11 @@
 # JPetStore configuration
 ---
 activityDelay: 1
-phantom:
-  baseUrl: http://172.17.0.2:8080/jpetstore/
-  path: /home/reiner/Projects/iObserve/experiments/tools/phantomjs-2.1.1-linux-x86_64/bin/phantomjs
-  timeout: 1000
+webDriverConfiguration:
+  baseUrl: http://172.18.0.5:8080/jpetstore-frontend/
+  type: org.iobserve.selenium.behavior.ChromeDriverFactory
+  driver: /home/reiner/Projects/iObserve/experiments/tools/chromedriver
+  timeout: 60000
 workloads:
   - name: AccountManager
     intensity:

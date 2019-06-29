@@ -76,7 +76,7 @@ information "Start jpetstore"
 
 docker network create --driver bridge jpetstore-net
 
-docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account --network=jpetstore-net jpetstore-account-service
+docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account --network=jpetstore-net jpetstore-account-service-plain
 docker run -e LOGGER=$LOGGER -d --name order --network=jpetstore-net jpetstore-order-service
 docker run -e LOGGER=$LOGGER -d --name catalog --network=jpetstore-net jpetstore-catalog-service
 docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstore-frontend-service

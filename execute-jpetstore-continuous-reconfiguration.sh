@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## Execute a distributed JPetStore with docker locally
+## including a migration scheme, where one accounting component
+## is redeployed 10000 times.
+## This variant does not support a workload driver.
+
+REDEPLOYS = 10000
+
 # parameter
 # $1 = workload driver configuration (optional)
 
@@ -61,7 +68,7 @@ docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstor
 ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
 FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
-SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend/"
+SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
 
 information "Service URL $SERVICE_URL"
 
@@ -72,7 +79,7 @@ done
 
 ITERATION=0
 
-while [ $ITERATION -lt 10000 ] ; do
+while [ $ITERATION -lt $REDEPLOYS ] ; do
 	ITERATION=`expr $ITERATION + 1`
 	echo "Redeployment $ITERATION"
 
