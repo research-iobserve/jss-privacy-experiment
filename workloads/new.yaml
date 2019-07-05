@@ -22,6 +22,6 @@ behaviors:
         repetition: { min: 4, max: 5 }
         parameters:
           amount: { min: 1, max: 5 }
-          item: random
+          item: FL-DSH-01
           category: CATS
 

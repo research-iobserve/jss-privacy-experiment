@@ -55,10 +55,10 @@ kieker.monitoring.hostname=
 kieker.monitoring.metadata=true
 
 # file collector
-iobserve.analysis.source=org.iobserve.service.source.GenericFileSourceCompositeStage
-kieker.analysisteetime.plugin.reader.filesystem.LogsReaderCompositeStage.logDirectories=${KIEKER_DIR}/
+kieker.tools.source=kieker.tools.source.LogsReaderCompositeStage
+kieker.tools.source.LogsReaderCompositeStage.logDirectories=${KIEKER_DIR}/
 
-org.iobserve.evaluate.jss.EvaluateMain.outputFile=${EXECUTION_RESULTS_DIR}/execution-${ITERATION}.csv
+org.iobserve.stages.sink.CSVFileWriter.outputFile=${EXECUTION_RESULTS_DIR}/execution-${ITERATION}.csv
 EOF
 		# execute evaluation
 		EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
