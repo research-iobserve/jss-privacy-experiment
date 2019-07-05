@@ -86,7 +86,7 @@ fi
 # check setup
 
 checkExecutable workload-runner $WORKLOAD_RUNNER
-checkExecutable web-driver $WEB_DRIVER
+checkExecutable access-control $AC_CONFIGURATION
 checkFile log-configuration $BASE_DIR/log4j.cfg
 
 checkFile workload "$WORKLOAD_PATH"
