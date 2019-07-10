@@ -1,2 +1,4 @@
 data/**
 executions/**
+simulated-account-services-*
+ac-*.log

@@ -21,10 +21,13 @@ LOGGER=192.168.48.213
 ## executables
 
 # jpetsotre script
-JPETSTORE="$BASE_DIR/execute-jpetstore.sh"
+JPETSTORE="$BASE_DIR/execute-jpetstore-continuous-reconfiguration.sh"
 
 # iobserve analysis
 ANALYSIS="$TOOLS_DIR/analysis-0.0.3-SNAPSHOT/bin/analysis"
+
+# iobserve reconfiguration access control
+AC_CONFIGURATION="$TOOLS_DIR/runtime-reconfigure-monitoring-controller-0.0.3-SNAPSHOT/bin/runtime-reconfigure-monitoring-controller"
 
 # workload driver
 WORKLOAD_RUNNER=$TOOLS_DIR/selenium-experiment-workloads-1.0/bin/selenium-experiment-workloads
