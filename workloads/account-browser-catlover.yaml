@@ -11,20 +11,20 @@ workloads:
     intensity:
       type: org.iobserve.selenium.configuration.ConstantWorkloadIntensity
       name: AccountManager
-      spawnPerSecond: 0.1
-      durations: [ 40000 ]
+      spawnPerSecond: 1
+      durations: [ 60000 ]
   - name: BrowsingUser
     intensity:
       type: org.iobserve.selenium.configuration.ConstantWorkloadIntensity
       name: BrowsingUser
-      spawnPerSecond: 0.5
-      durations: [ 40000 ]
+      spawnPerSecond: 0.01
+      durations: [ 60000 ]
   - name: CatLoverBehavior
     intensity:
       type: org.iobserve.selenium.configuration.ConstantWorkloadIntensity
       name: CatLoverBehavior
-      spawnPerSecond: 0.2
-      durations: [ 40000 ]
+      spawnPerSecond: 0.01
+      durations: [ 60000 ]
 behaviors:
   AccountManager:
     name: AccountManager
