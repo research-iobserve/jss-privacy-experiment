@@ -1,5 +1,6 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 FRONTEND="192.168.48.223"
 SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
 
