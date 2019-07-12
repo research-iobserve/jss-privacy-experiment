@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASE_DIR=$(cd "$(dirname "$0")"; pwd)
+
 if [ -f $BASE_DIR/config ] ; then
 	. $BASE_DIR/config
 else
