@@ -11,7 +11,7 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
-checkExecutable repai-log files ${REPAIR_LOG_FILES}
+checkExecutable repair-log-files ${REPAIR_LOG_FILES}
 
 if [ "$1" == "" ] ; then
 	error "Plase specify and experiment ID"
@@ -25,7 +25,9 @@ if [ ! -d "${PROBE_DIR}" ] ; then
 	exit
 fi
 
-find ${PROBE_DIR} -name '*.dat' -exec ${REPAIR_LOG_FILES} -i {} \;
+for I in `find ${PROBE_DIR}/ -name '*.dat' | grep -v "control-time"` ; do
+	${REPAIR_LOG_FILES} -i $I
+done
 
 # end
 
