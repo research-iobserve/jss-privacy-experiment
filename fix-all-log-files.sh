@@ -11,9 +11,21 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
-PROBE_DIR="/home/reiner/data/probe-experiment/exp-1"
+checkExecutable repai-log files ${REPAIR_LOG_FILES}
 
-find ${PROBE_DIR} -name '*.dat' -exec ${TOOLS_DIR}/repair-log-files-0.0.3-SNAPSHOT/bin/repair-log-files -i {} \;
+if [ "$1" == "" ] ; then
+	error "Plase specify and experiment ID"
+	exit
+fi
+
+PROBE_DIR="${PROBE_BASE_DIR}/exp-$1"
+
+if [ ! -d "${PROBE_DIR}" ] ; then
+	echo "Probe measurements directory cannot be found at ${PROBE_DIR}"
+	exit
+fi
+
+find ${PROBE_DIR} -name '*.dat' -exec ${REPAIR_LOG_FILES} -i {} \;
 
 # end
 
