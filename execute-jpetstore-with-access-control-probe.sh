@@ -82,6 +82,13 @@ else
 	LIST_SIZE="$2"
 fi
 
+if [ "$3" == "" ] ; then
+	error "Requires experiment number to distinguish repetitions."
+	exit 1
+else
+	EXPERIMENT="$3"
+fi
+
 ###################################
 # check setup
 
@@ -93,7 +100,7 @@ checkFile workload "$WORKLOAD_PATH"
 
 information "Using workload ${WORKLOAD_PATH}"
 
-export PROBE_DATA_DIR="${DATA_DIR}/probe"
+export PROBE_DATA_DIR="${DATA_DIR}/probe/exp-${EXPERIMENT}"
 
 ###################################
 # create configurations
