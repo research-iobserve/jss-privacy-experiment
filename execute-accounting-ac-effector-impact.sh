@@ -172,6 +172,12 @@ mkdir -p "${STORAGE_PATH}"
 mkdir -p "${COLLECTOR_DATA_PATH}"
 
 ###################################
+# check tools
+checkExecutable access-control "$AC_CONFIGURATION"
+checkExecutable collector "$COLLECTOR"
+checkExecutable drive-accounting "$DRIVE_ACCOUNTING"
+
+###################################
 # check if no leftovers are running
 
 # stop docker
