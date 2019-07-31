@@ -21,8 +21,6 @@ else
 	information "Experiment $EXPERIMENT_ID"
 fi
 
-EVAL_PERFORMANCE="$TOOLS_DIR/evaluate-jss-performance-0.0.3-SNAPSHOT/bin/evaluate-jss-performance"
-
 checkExecutable "Performance evaluation" "${EVAL_PERFORMANCE}"
 
 EXECUTION_DIR="${BASE_DIR}/executions/${EXPERIMENT_ID}"
