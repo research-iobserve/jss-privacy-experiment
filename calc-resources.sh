@@ -64,8 +64,6 @@ information "Running ${MEASUREMENT_DIR}"
 export CALCULATE_RESOURCES_OPTS="-Dlog4j.configuration=file:///$BASE_DIR/log4j-info.cfg"
 ${CALC_RESOURCES} -c resources.conf
 
-rm resources.conf
-
 # end
 rm resources.conf
 
