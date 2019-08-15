@@ -1,11 +1,12 @@
 #!/bin/bash
 
-## Execute a distributed JPetStore with docker locally.
-## Utilize one workload model to drive the JPetStore or
-## allow interactive mode.
+# Execute a distributed JPetStore with docker locally.
+# Utilize one workload model to drive the JPetStore.
 
 # parameter
-# $1 = workload driver configuration (optional)
+# $1 = workload driver configuration
+# $2 = size of the black and whitelist
+# $3 = experiment identifier to separate different runs
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
@@ -20,6 +21,25 @@ fi
 
 #############################################
 # common functions
+
+# stopping docker container
+function stopDocker() {
+	information "Stopping existing distributed jpetstore instances ..."
+
+	docker stop frontend
+	docker stop order
+	docker stop catalog
+	docker stop account
+
+	docker rm frontend
+	docker rm order
+	docker rm catalog
+	docker rm account
+
+	docker network rm jpetstore-net
+
+	information "done"
+}
 
 # $1 = list size
 # $2 = blacklist start
@@ -102,7 +122,7 @@ mkdir -p "${CONTROL_TIME}"
 RESPONSE_TIME_PROPERTIES="$BASE_DIR/kieker-calc-response-time.properties"
 CONTROL_TIME_PROPERTIES="$BASE_DIR/kieker-probe-control-time.properties"
 
-cat << EOF > $RESPONSE_TIME_PROPERTIES
+cat << EOF > "${RESPONSE_TIME_PROPERTIES}"
 kieker.monitoring.name=KIEKER
 kieker.monitoring.debug=false
 kieker.monitoring.enabled=true
@@ -139,7 +159,7 @@ kieker.monitoring.writer.filesystem.BinaryFileWriter.bufferSize=8192
 kieker.monitoring.writer.filesystem.BinaryFileWriter.compression=kieker.monitoring.writer.compression.NoneCompressionFilter
 EOF
 
-cat << EOF > $CONTROL_TIME_PROPERTIES
+cat << EOF > "${CONTROL_TIME_PROPERTIES}"
 kieker.monitoring.name=KIEKER
 kieker.monitoring.debug=false
 kieker.monitoring.enabled=true
@@ -179,13 +199,25 @@ EOF
 ###################################
 # check if no leftovers are running
 
+# stop docker
+stopDocker
+
 ###################################
 # starting
 
 # jpetstore
 
-FRONTEND="192.168.48.223"
-ACCOUNT="192.168.48.223"
+information "Start jpetstore"
+
+docker network create --driver bridge jpetstore-net
+
+docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account -p 5791:5791 --network=jpetstore-net jpetstore-account-service
+docker run -e LOGGER=$LOGGER -d --name order --network=jpetstore-net jpetstore-order-service
+docker run -e LOGGER=$LOGGER -d --name catalog --network=jpetstore-net jpetstore-catalog-service
+docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net -p 8080:8080 jpetstore-frontend-service
+
+ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
+FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
 SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
 
@@ -195,6 +227,9 @@ while ! curl -sSf $SERVICE_URL 2> /dev/null > /dev/null ; do
 	echo "wait for service coming up..."
 	sleep 1
 done
+
+ID=`docker ps | grep 'account' | awk '{ print $1 }'`
+ACCOUNT=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
 # send configuration
 WS=`expr 10 + $LIST_SIZE`
@@ -209,7 +244,7 @@ export WORKLOAD_PID=$!
 
 ITERATION=0
 
-REDEPLOYS=1000
+REDEPLOYS=10000
 
 while [ $ITERATION -lt $REDEPLOYS ] ; do
         ITERATION=`expr $ITERATION + 1`
@@ -231,6 +266,11 @@ sleep 10
 kill -TERM $WORKLOAD_PID
 sleep 10
 kill -9 $WORKLOAD_PID
+
+# shutdown jpetstore
+stopDocker
+
+rm "${CONTROL_TIME_PROPERTIES}" "${RESPONSE_TIME_PROPERTIES}"
 
 # end
 

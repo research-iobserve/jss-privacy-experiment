@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Executing the access control effector performance experiment
+# Requires
+# - DRIVE_ACCOUNTNG
+# - COLLECTOR
+# - RECONFIGURE_ACCESS_CONTROL
+
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 if [ -f $BASE_DIR/config ] ; then
@@ -103,7 +109,7 @@ kieker.monitoring.writer.filesystem.BinaryFileWriter.bufferSize=8192
 kieker.monitoring.writer.filesystem.BinaryFileWriter.compression=kieker.monitoring.writer.compression.NoneCompressionFilter
 EOF
 
-        export DRIVE_ACCOUNTING_OPTS="-Dlog4j.configuration=file:///${BASE_DIR}/log4j.cfg -Dkieker.monitoring.configuration=${ACCOUNTING_KIEKER_PROPERTIES}"
+	export DRIVE_ACCOUNTING_OPTS="-Dlog4j.configuration=file:///${BASE_DIR}/log4j.cfg -Dkieker.monitoring.configuration=${ACCOUNTING_KIEKER_PROPERTIES}"
 	${DRIVE_ACCOUNTING} -u $1 -d 100 -c $COUNT -r $REPETITIONS
 }
 
@@ -118,9 +124,9 @@ kieker.monitoring.hostname=
 kieker.monitoring.metadata=true
 
 # TCP collector
-iobserve.service.reader=org.iobserve.service.source.MultipleConnectionTcpCompositeStage
-org.iobserve.service.source.MultipleConnectionTcpCompositeStage.port=9876
-org.iobserve.service.source.MultipleConnectionTcpCompositeStage.capacity=81920
+kieker.tools.source=kieker.tools.source.MultipleConnectionTcpCompositeStage
+kieker.tools.source.MultipleConnectionTcpCompositeStage.port=9876
+kieker.tools.source.MultipleConnectionTcpCompositeStage.capacity=81920
 
 # dump stage
 kieker.monitoring.writer=kieker.monitoring.writer.filesystem.FileWriter
@@ -137,7 +143,7 @@ kieker.monitoring.writer.filesystem.FileWriter.logStreamHandler=kieker.monitorin
 kieker.monitoring.writer.filesystem.FileWriter.flush=true
 kieker.monitoring.writer.filesystem.FileWriter.bufferSize=81920
 EOF
-        export COLLECTOR_OPTS="-Dlog4j.configuration=file:///${BASE_DIR}/log4j.cfg"
+	export COLLECTOR_OPTS="-Dlog4j.configuration=file:///${BASE_DIR}/log4j.cfg"
 	$COLLECTOR -c "${COLLECTOR_PROPERTIES}" &
 	COLLECTOR_PID=$!
 
@@ -166,32 +172,32 @@ function configureEffector() {
 	B_BASE="1"
 	W_BASE=`expr $1 + 10`
 
-        BS_LOW=`expr $B_BASE % 256`
-        BS_HIGH=`expr $B_BASE / 256`
+	BS_LOW=`expr $B_BASE % 256`
+	BS_HIGH=`expr $B_BASE / 256`
 
-        BE=`expr $B_BASE + $1`
-        BE_LOW=`expr $BE % 256`
-        BE_HIGH=`expr $BE / 256`
+	BE=`expr $B_BASE + $1`
+	BE_LOW=`expr $BE % 256`
+	BE_HIGH=`expr $BE / 256`
 
-        WS_LOW=`expr $W_BASE % 256`
-        WS_HIGH=`expr $W_BASE / 256`
+	WS_LOW=`expr $W_BASE % 256`
+	WS_HIGH=`expr $W_BASE / 256`
 
-        WE=`expr $W_BASE + $1`
-        WE_LOW=`expr $WE % 256`
-        WE_HIGH=`expr $WE / 256`
+	WE=`expr $W_BASE + $1`
+	WE_LOW=`expr $WE % 256`
+	WE_HIGH=`expr $WE / 256`
 
-        information "blacklist $BS_HIGH.$BS_LOW - $BE_HIGH.$BE_LOW  whitelist $WS_HIGH.$WS_LOW - $WE_HIGH.$WE_LOW"
+	information "blacklist $BS_HIGH.$BS_LOW - $BE_HIGH.$BE_LOW  whitelist $WS_HIGH.$WS_LOW - $WE_HIGH.$WE_LOW"
 
-        export RUNTIME_RECONFIGURE_MONITORING_CONTROLLER_OPTS="-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg -Dkieker.monitoring.configuration=$CONTROL_TIME_PROPERTIES"
-        $AC_CONFIGURATION -bs "$PREFIX.$BS_HIGH.$BS_LOW" -be "$PREFIX.$BE_HIGH.$BE_LOW" \
-                -h "${ACCOUNT_SERVICE}" -p 5791 -ws "$PREFIX.$WS_HIGH.$WS_LOW" -we "$PREFIX.$WE_HIGH.$WE_LOW" -w 172.17.0.1 "${ACCOUNT_SERVICE}"
+	export RECONFIGURE_ACCESS_CONTROL_OPTS="-Dlog4j.configuration=file:///${BASE_DIR}/log4j.cfg -Dkieker.monitoring.configuration=$CONTROL_TIME_PROPERTIES"
+	${RECONFIGURE_ACCESS_CONTROL} -bs "$PREFIX.$BS_HIGH.$BS_LOW" -be "$PREFIX.$BE_HIGH.$BE_LOW" \
+		-h "${ACCOUNT_SERVICE}" -p 5791 -ws "$PREFIX.$WS_HIGH.$WS_LOW" -we "$PREFIX.$WE_HIGH.$WE_LOW" -w 172.17.0.1 "${ACCOUNT_SERVICE}"
 
 	information "done"
 }
 
 
 ###################################
-# check parameters
+# setup path
 
 ACCOUNTING_KIEKER_PROPERTIES="$BASE_DIR/kieker-drive-accounting.properties"
 COLLECTOR_PROPERTIES="$BASE_DIR/kieker-collector.properties"
@@ -199,9 +205,14 @@ COLLECTOR_PROPERTIES="$BASE_DIR/kieker-collector.properties"
 export STORAGE_PATH="${DATA_DIR}/${RUN_TYPE}/responses"
 export COLLECTOR_DATA_PATH="${DATA_DIR}/${RUN_TYPE}/collector"
 
-checkExecutable access-control "$AC_CONFIGURATION"
+###################################
+# check tools
+checkExecutable reconfigure-access-control "$RECONFIGURE_ACCESS_CONTROL"
 checkExecutable collector "$COLLECTOR"
 checkExecutable drive-accounting "$DRIVE_ACCOUNTING"
+
+###################################
+# check directories
 checkDirectory data-dir "${DATA_DIR}"
 
 if [ -d "${STORAGE_PATH}" ] ; then
@@ -243,8 +254,7 @@ stopDocker
 
 stopCollector
 
+rm $COLLECTOR_PROPERTIES $ACCOUNTING_KIEKER_PROPERTIES
+
 # end
-
-
-
 

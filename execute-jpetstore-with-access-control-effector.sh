@@ -1,11 +1,6 @@
 #!/bin/bash
 
-## Execute a distributed JPetStore with docker locally.
-## Utilize one workload model to drive the JPetStore or
-## allow interactive mode.
-
-# parameter
-# $1 = workload driver configuration (optional)
+# Execute a distributed JPetStore with docker locally.
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
@@ -42,27 +37,9 @@ function stopDocker() {
 
 ###################################
 # check parameters
-if [ "$1" == "" ] ; then
-	export INTERACTIVE="yes"
-	information "Interactive mode no specialized workload driver"
-else
-	export INTERACTIVE="no"
-	checkFile workload "$1"
-	WORKLOAD_PATH="$1"
-	information "Automatic mode, workload driver is ${WORKLOAD_PATH}"
-fi
 
 ###################################
 # check setup
-
-if [ "$INTERACTIVE" == "no" ] ; then
-	checkExecutable workload-runner $WORKLOAD_RUNNER
-	checkExecutable web-driver $WEB_DRIVER
-	checkFile log-configuration $BASE_DIR/log4j.cfg
-fi
-
-###################################
-# check if no leftovers are running
 
 # stop docker
 stopDocker
@@ -76,10 +53,10 @@ information "Start jpetstore"
 
 docker network create --driver bridge jpetstore-net
 
-docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account --network=jpetstore-net jpetstore-account-service
+docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account -p 5791:5791 --network=jpetstore-net jpetstore-account-service
 docker run -e LOGGER=$LOGGER -d --name order --network=jpetstore-net jpetstore-order-service
 docker run -e LOGGER=$LOGGER -d --name catalog --network=jpetstore-net jpetstore-catalog-service
-docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net jpetstore-frontend-service
+docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net -p 8080:8080 jpetstore-frontend-service
 
 ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
 FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
@@ -89,29 +66,25 @@ SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
 information "Service URL $SERVICE_URL"
 
 while ! curl -sSf $SERVICE_URL 2> /dev/null > /dev/null ; do
-	echo "wait for service coming up..."
+	echo "waiting for service coming up..."
 	sleep 1
 done
 
-# check workload
-if [ "$INTERACTIVE" == "yes" ] ; then
-	information "You may now use JPetStore"
-	information "Press Enter to stop the service"
-	read
-else
-	information "Running workload driver"
+information "JPetStore is running.."
 
-        export SELENIUM_EXPERIMENT_WORKLOADS_OPTS=-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg
-        $WORKLOAD_RUNNER -c $WORKLOAD_PATH -u "$SERVICE_URL" -d "$WEB_DRIVER"
+while [ -f "${BASE_DIR}/ac.token" ] ; do
+	sleep 60
+done
 
-        sleep 10
-fi
+information "Running token removed. Shutting down."
 
 ###################################
 # shutdown
 
 # shutdown jpetstore
 stopDocker
+
+information "Done"
 
 # end
 

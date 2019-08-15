@@ -120,13 +120,5 @@ wait $WORKLOAD_RUNNER_PID
 # shutdown jpetstore
 stopKube
 
-sleep 120
-
-# shutdown analysis/collector
-information "Term Analysis"
-
-kill -TERM ${COLLECTOR_PID}
-rm collector.config
-
 information "Done."
 # end

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Fix kieker log files.
+
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 if [ -f $BASE_DIR/config ] ; then
@@ -14,23 +16,18 @@ fi
 checkExecutable repair-log-files ${REPAIR_LOG_FILES}
 
 if [ "$1" == "" ] ; then
-	error "Plase specify an data source identifier"
+	error "Please specify a Kieker log directory"
 	exit
 fi
 
-if [ "$2" == "" ] ; then
-	error "Plase specify and experiment ID"
+KIEKER_DIR="$1"
+
+if [ ! -d "${KIEKER_DIR}" ] ; then
+	error "Probe measurements directory cannot be found at ${KIEKER_DIR}"
 	exit
 fi
 
-PROBE_DIR="$1/exp-$2"
-
-if [ ! -d "${PROBE_DIR}" ] ; then
-	echo "Probe measurements directory cannot be found at ${PROBE_DIR}"
-	exit
-fi
-
-for I in `find ${PROBE_DIR}/ -name '*.dat' | grep -v "control-time"` ; do
+for I in `find ${KIEKER_DIR}/ -name '*.dat'` ; do
 	echo $I
 	${REPAIR_LOG_FILES} -i $I
 	if [ -f "$I" ] ; then

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Run an JPetStore and collect all events.
+# Requires
+# - JPETSTORE runner script which also runs a workload driver
+# - collector
+
+# Parameter
+# - $1 = workload path, optional
+
 # execute setup
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
@@ -124,6 +132,9 @@ kill -TERM ${COLLECTOR_PID}
 rm collector.config
 
 wait ${COLLECTOR_PID}
+
+#
+rm collector.config
 
 information "Experiment complete."
 

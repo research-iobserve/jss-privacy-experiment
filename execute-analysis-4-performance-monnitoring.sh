@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # run privacy analysis based on observed and logged events.
+# Requires
+# - PRIVACY_ANALYSIS
+# - REPLAYER
+# - Collected data from a simulated or real jPetStore run
 
 # execute setup
 
@@ -31,17 +35,17 @@ fi
 
 information "Running analysis for experiment $EXPERIMENT_ID, iteration $ITERATION"
 
-PRIVACY_ANALYSIS="$TOOLS_DIR/service.privacy.violation-0.0.3-SNAPSHOT/bin/service.privacy.violation"
-REPLAYER="$TOOLS_DIR/replayer-0.0.3-SNAPSHOT/bin/replayer"
+###################################
+# setup paths
 
 EXECUTION_DIR="${BASE_DIR}/executions/${EXPERIMENT_ID}/${ITERATION}"
 PRIVACY_MEASUREMENTS_DIR="${EXECUTION_DIR}/privacy-result"
 
 INPUT_DIR="${DATA_DIR}/input/${EXPERIMENT_ID}"
 
-checkExecutable "privacy analysis" "${PRIVACY_ANALYSIS}"
+checkExecutable "service privacy violation" "${SERVICE_PRIVACY_VIOLATION}"
 checkExecutable "replayer" "${REPLAYER}"
-checkExecutable "input directory" "${INPUT_DIR}"
+checkDirectory "input directory" "${INPUT_DIR}"
 
 ###################################
 
@@ -57,7 +61,7 @@ mkdir "${PRIVACY_MEASUREMENTS_DIR}"
 ##
 ## configuration for monitoring the privacy analysis
 ##
-cat << EOF > ${PRIVACY_KIEKER_PROPERTIES}
+cat << EOF > "${PRIVACY_KIEKER_PROPERTIES}"
 kieker.monitoring.name=KIEKER
 kieker.monitoring.debug=false
 kieker.monitoring.enabled=true
@@ -86,12 +90,12 @@ kieker.monitoring.writer.filesystem.FileWriter.maxLogSize=-1
 kieker.monitoring.writer.filesystem.FileWriter.maxLogFiles=-1
 kieker.monitoring.writer.filesystem.FileWriter.mapFileHandler=kieker.monitoring.writer.filesystem.TextMapFileHandler
 kieker.monitoring.writer.filesystem.TextMapFileHandler.flush=true
-kieker.monitoring.writer.filesystem.TextMapFileHandler.compression=kieker.monitoring.writer.filesystem.compression.NoneCompressionFilter
+kieker.monitoring.writer.filesystem.TextMapFileHandler.compression=kieker.monitoring.writer.compression.NoneCompressionFilter
 kieker.monitoring.writer.filesystem.FileWriter.logFilePoolHandler=kieker.monitoring.writer.filesystem.RotatingLogFilePoolHandler
 kieker.monitoring.writer.filesystem.FileWriter.logStreamHandler=kieker.monitoring.writer.filesystem.TextLogStreamHandler
 kieker.monitoring.writer.filesystem.FileWriter.flush=false
 kieker.monitoring.writer.filesystem.BinaryFileWriter.bufferSize=8192
-kieker.monitoring.writer.filesystem.BinaryFileWriter.compression=kieker.monitoring.writer.filesystem.compression.NoneCompressionFilter
+kieker.monitoring.writer.filesystem.BinaryFileWriter.compression=kieker.monitoring.writer.compression.NoneCompressionFilter
 EOF
 
 
@@ -104,9 +108,9 @@ kieker.monitoring.name=EXP
 kieker.monitoring.hostname=
 kieker.monitoring.metadata=true
 
-iobserve.analysis.source=org.iobserve.service.source.MultipleConnectionTcpCompositeStage
-org.iobserve.service.source.MultipleConnectionTcpCompositeStage.port=9876
-org.iobserve.service.source.MultipleConnectionTcpCompositeStage.capacity=8192
+kieker.tools.source=kieker.tools.source.MultipleConnectionTcpSourceCompositeStage
+kieker.tools.source.MultipleConnectionTcpSourceCompositeStage.port=9876
+kieker.tools.source.MultipleConnectionTcpSourceCompositeStage.capacity=81920
 
 # data storage
 iobserve.analysis.model.pcm.databaseDirectory=$EXECUTION_DIR/db/
@@ -115,7 +119,7 @@ iobserve.analysis.model.pcm.initializationDirectory=$BASE_DIR/pcm/
 # privacy configuration
 iobserve.analysis.privacy.alarmFile=$EXECUTION_DIR/alarms.txt
 iobserve.analysis.privacy.warningFile=$EXECUTION_DIR/warnings.txt
-iobserve.analysis.privacy.modelDumpDirectory=$EXECUTION_DIR/snapshots/
+#iobserve.analysis.privacy.modelDumpDirectory=$EXECUTION_DIR/snapshots/
 
 iobserve.analysis.privacy.policyList=NoPersonalDataInUSAPolicy
 iobserve.analysis.privacy.packagePrefix=org.iobserve.service.privacy.violation.transformation.privacycheck.policies
@@ -127,8 +131,8 @@ EOF
 ## running privacy analysis
 ##
 export SERVICE_PRIVACY_VIOLATION_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j.cfg -Dkieker.monitoring.configuration=${PRIVACY_KIEKER_PROPERTIES}"
-${PRIVACY_ANALYSIS} -c "${PRIVACY_CONFIG}" &
-PRIVACY_ANALYSIS_PID=$!
+${SERVICE_PRIVACY_VIOLATION} -c "${PRIVACY_CONFIG}" &
+SERVICE_PRIVACY_VIOLATION_PID=$!
 
 information "Wait for service to be started properly"
 sleep 20
@@ -140,12 +144,15 @@ KIEKER=`ls "${INPUT_DIR}/" | grep "kieker-"`
 ##
 ## running event replayer
 ##
-REPLAYER_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j.cfg"
+export REPLAYER_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-info.cfg"
 ${REPLAYER} -p 9876 -i "${INPUT_DIR}/${KIEKER}"  -h localhost -r -c 100 -d 4
 
-kill -TERM $PRIVACY_ANALYSIS_PID
+kill -TERM $SERVICE_PRIVACY_VIOLATION_PID
 sleep 10
-kill -9 $PRIVACY_ANALYSIS_PID
+kill -9 $SERVICE_PRIVACY_VIOLATION_PID
+
+##
+rm "${PRIVACY_CONFIG}" "${PRIVACY_KIEKER_PROPERTIES}"
 
 information "Experiment complete."
 

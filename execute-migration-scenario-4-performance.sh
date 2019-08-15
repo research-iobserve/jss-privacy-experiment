@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# execute setup
+# Run the performance experiment 200 times and calculate the
+# response times.
+
+# parameter
+# $1 = experiment id
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
@@ -21,7 +25,7 @@ else
 	information "Experiment $EXPERIMENT_ID"
 fi
 
-checkExecutable "Performance evaluation" "${EVAL_PERFORMANCE}"
+checkExecutable "Performance evaluation" "${EVAL_SERVICE_PERFORMANCE}"
 
 EXECUTION_DIR="${BASE_DIR}/executions/${EXPERIMENT_ID}"
 
@@ -35,7 +39,7 @@ while [ "$ITERATION" != "200" ] ; do
 		echo "Skipping existing run $ITERATION"
 	else
 		# execute privacy analysis
-		$BASE_DIR/execute-analysis.sh "${EXPERIMENT_ID}" "${ITERATION}"
+		$BASE_DIR/execute-analysis-4-performance-monitoring.sh "${EXPERIMENT_ID}" "${ITERATION}"
 
 		KIEKER_BASE_DIR="${EXECUTION_DIR}/${ITERATION}/privacy-result"
 		EXECUTION_RESULTS_DIR="${EXECUTION_DIR}/${ITERATION}/performance-results"
@@ -59,8 +63,10 @@ kieker.tools.source.LogsReaderCompositeStage.logDirectories=${KIEKER_DIR}/
 org.iobserve.stages.sink.CSVFileWriter.outputFile=${EXECUTION_RESULTS_DIR}/execution-${ITERATION}.csv
 EOF
 		# execute evaluation
-		EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
-		${EVAL_PERFORMANCE} -c $BASE_DIR/eval.config
+		EVALUATE_SERVICE_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j-debug.cfg"
+		${EVAL_SERVICE_PERFORMANCE} -c $BASE_DIR/eval.config
+
+		rm $BASE_DIR/eval.config
 	fi
 	ITERATION=`expr $ITERATION + 1`
 done

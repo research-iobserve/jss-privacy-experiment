@@ -1,11 +1,16 @@
 #!/bin/bash
 
-## Execute a distributed JPetStore with docker locally.
-## Utilize one workload model to drive the JPetStore or
-## allow interactive mode.
+# Change the access control effector at runtime REDEPLOYS times.
+# Utilize one workload model to drive the JPetStore. 
+#
+# Requires:
+# - WORKLOAD_RUNNER
+# - RECONFIGURE_ACCESS_CONTROL
 
 # parameter
-# $1 = workload driver configuration (optional)
+# $1 = workload driver configuration
+# $2 = number of nodes listed in the black and white lists
+# $3 = experiment number to distinguish repetitions
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
@@ -19,26 +24,15 @@ fi
 . $BASE_DIR/common-functions.sh
 
 #############################################
+# local setup
+
+FRONTEND="192.168.48.223"
+ACCOUNT="192.168.48.223"
+
+REDEPLOYS=1000
+
+#############################################
 # common functions
-
-# stopping docker container
-function stopDocker() {
-	information "Stopping existing distributed jpetstore instances ..."
-
-	docker stop frontend
-	docker stop order
-	docker stop catalog
-	docker stop account
-
-	docker rm frontend
-	docker rm order
-	docker rm catalog
-	docker rm account
-
-	docker network rm jpetstore-net
-
-	information "done"
-}
 
 # $1 = list size
 # $2 = blacklist start
@@ -61,8 +55,8 @@ function triggerNewLists() {
 
 	# information "blacklist $BS_HIGH.$BS_LOW - $BE_HIGH.$BE_LOW  whitelist $WS_HIGH.$WS_LOW - $WE_HIGH.$WE_LOW"
 
-	export RUNTIME_RECONFIGURE_MONITORING_CONTROLLER_OPTS="-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg -Dkieker.monitoring.configuration=$CONTROL_TIME_PROPERTIES"
-	$AC_CONFIGURATION -bs "$4.$BS_HIGH.$BS_LOW" -be "$4.$BE_HIGH.$BE_LOW" \
+	export RECONFIGURE_ACCESS_CONTROL_OPTS="-Dlog4j.configuration=file:///$BASE_DIR/log4j.cfg -Dkieker.monitoring.configuration=$CONTROL_TIME_PROPERTIES"
+	$RECONFIGURE_ACCESS_CONTROL -bs "$4.$BS_HIGH.$BS_LOW" -be "$4.$BE_HIGH.$BE_LOW" \
 		-h $ACCOUNT -p 5791 -ws "$4.$WS_HIGH.$WS_LOW" -we "$4.$WE_HIGH.$WE_LOW" -w $FRONTEND
 }
 
@@ -93,7 +87,7 @@ fi
 # check setup
 
 checkExecutable workload-runner $WORKLOAD_RUNNER
-checkExecutable access-control $AC_CONFIGURATION
+checkExecutable access-control $RECONFIGURE_ACCESS_CONTROL
 checkFile log-configuration $BASE_DIR/log4j.cfg
 
 checkFile workload "$WORKLOAD_PATH"
@@ -198,25 +192,10 @@ EOF
 ###################################
 # check if no leftovers are running
 
-# stop docker
-stopDocker
-
 ###################################
 # starting
 
 # jpetstore
-
-information "Start jpetstore"
-
-docker network create --driver bridge jpetstore-net
-
-docker run -e LOGGER=$LOGGER -e LOCATION=GERMANY -d --name account -p 5791:5791 --network=jpetstore-net jpetstore-account-service
-docker run -e LOGGER=$LOGGER -d --name order --network=jpetstore-net jpetstore-order-service
-docker run -e LOGGER=$LOGGER -d --name catalog --network=jpetstore-net jpetstore-catalog-service
-docker run -e LOGGER=$LOGGER -d --name frontend --network=jpetstore-net -p 8080:8080 jpetstore-frontend-service
-
-ID=`docker ps | grep 'frontend' | awk '{ print $1 }'`
-FRONTEND=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
 SERVICE_URL="http://$FRONTEND:8080/jpetstore-frontend"
 
@@ -226,9 +205,6 @@ while ! curl -sSf $SERVICE_URL 2> /dev/null > /dev/null ; do
 	echo "wait for service coming up..."
 	sleep 1
 done
-
-ID=`docker ps | grep 'account' | awk '{ print $1 }'`
-ACCOUNT=`docker inspect $ID | grep '"IPAddress' | awk '{ print $2 }' | tail -1 | sed 's/^"\(.*\)",/\1/g'`
 
 # send configuration
 WS=`expr 10 + $LIST_SIZE`
@@ -242,8 +218,6 @@ $WORKLOAD_RUNNER -c $WORKLOAD_PATH -u "$SERVICE_URL" &
 export WORKLOAD_PID=$!
 
 ITERATION=0
-
-REDEPLOYS=10000
 
 while [ $ITERATION -lt $REDEPLOYS ] ; do
         ITERATION=`expr $ITERATION + 1`
@@ -266,8 +240,7 @@ kill -TERM $WORKLOAD_PID
 sleep 10
 kill -9 $WORKLOAD_PID
 
-# shutdown jpetstore
-stopDocker
+rm $CONTROL_TIME_PROPERTIES $RESPONSE_TIME_PROPERTIES
 
 # end
 

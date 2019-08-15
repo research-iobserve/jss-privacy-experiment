@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# (re)run jss performance result evaluation
+# (re)run service performance result evaluation
 
 # execute setup
 
@@ -18,9 +18,7 @@ fi
 ## configuration
 DATA_BASE_DIR="/data/reiner/jss-experiments/execution-2/"
 
-EVAL_PERFORMANCE="${TOOLS_DIR}/evaluate-jss-performance-0.0.3-SNAPSHOT/bin/evaluate-jss-performance"
-
-checkExecutable "performance evaluation" "${EVAL_PERFORMANCE}"
+checkExecutable "performance evaluation" "${EVAL_SERVICE_PERFORMANCE}"
 
 ## script
 
@@ -60,9 +58,11 @@ kieker.tools.source.LogsReaderCompositeStage.logDirectories=${KIEKER_DIR}/
 org.iobserve.stages.sink.CSVFileWriter.outputFile=${EXECUTION_RESULTS_DIR}/execution-${ITERATION}.csv
 EOF
 		# execute evaluation
-		EVALUATE_JSS_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j.cfg"
-		${EVAL_PERFORMANCE} -c $BASE_DIR/eval.config >> eval.log
+		EVALUATE_SERVICE_PERFORMANCE_OPTS="-Dlog4j.configuration=file://$BASE_DIR/log4j.cfg"
+		${EVAL_SERVICE_PERFORMANCE} -c $BASE_DIR/eval.config >> eval.log
 		ITERATION=`expr $ITERATION + 1`
+
+		rm $BASE_DIR/eval.config
 	done
 done 
 # end

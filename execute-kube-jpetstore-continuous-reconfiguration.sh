@@ -53,6 +53,10 @@ fi
 checkFile jpetstore-configuration $KUBERNETES_DIR/jpetstore.yaml
 checkFile usa-configuration $KUBERNETES_DIR/account-pod.yaml
 
+KUBECTL=`which kubectl`
+
+checkExecutable kubectl KUBECTL
+
 ###################################
 # check if no leftovers are running
 
@@ -115,14 +119,6 @@ done
 
 # shutdown jpetstore
 stopKube
-
-sleep 120
-
-# shutdown analysis/collector
-information "Term Analysis"
-
-kill -TERM ${COLLECTOR_PID}
-rm collector.config
 
 information "Done."
 

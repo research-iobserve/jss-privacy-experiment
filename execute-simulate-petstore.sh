@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# simulate JPetStore run for different accounting setups
+# Simulate JPetStore deployment changes over time.
+
+# Parameter:
+# $1 = number of redeployments
+# $2 = configuration set
+# $3 = experiment identifier prefix
 
 # execute setup
 
@@ -15,24 +20,50 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
-SIMULATOR="${TOOLS_DIR}/simulate-petstore-0.0.3-SNAPSHOT/bin/simulate-petstore"
+##########################
+# check parameters
 
-checkExecutable "simulate petstore" "${SIMULATOR}"
+if [ "$1" == "" ] ; then
+	error "Requires the number of redeployments."
+	exit 1
+fi
+
+if [ "$2" == "" ] ; then
+	error "You must define which set of JPetStore configurations you want to use. Choose one of ${!CONFIG_SET[@]}"
+	exit 1
+else
+	legal="false"
+	for I in ${!CONFIG_SET[@]} ; do
+		if [ "$I" == "$2" ] ; then
+			legal="true"
+			ACCOUNT_SET="$I"
+		fi
+	done
+	if [ "$legal" != "true" ] ; then
+		error "$2 is not a valid set."
+		error "You must define which set of JPetStore configurations you want to use. Choose one of ${!CONFIG_SET[@]}"
+		exit 1
+	fi
+fi
+
+if [ "$3" == "" ] ; then
+	error "You must specify an experiment base name, e.g., simulated-account-services"
+	exit 1
+fi
+
+REDEPLOYMENTS="$1"
+EXPERIMENT_ID_PREFIX="$3"
+
+checkExecutable "simulate petstore" "${SIMULATE_PETSTORE}"
 
 ###########################
 
 declare -a SIMPID
 
-# initial set
-#for I in 1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90 100 200 300 400 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 ; do
-# additional long set
-for I in 1 10 100 1000 10000 ; do
-# additional edge cases
-#for I in 11 12 13 14 15 95 110 120 130 140 150 550 560 570 580 590 710 720 730 740 750 950 960 970 980 990 1010 1020 1030 1040 1050 ; do
+for I in $CONFIG_SET[$ACCOUNT_SET] ; do
 	information "Generating data for $I accounting nodes."
 
-	EXPERIMENT_ID="simulated-account-services-long-$I"
-#	EXPERIMENT_ID="simulated-account-services-$I"
+	EXPERIMENT_ID="$EXPERIMENT_ID_PREFIX-$I"
 	RESULT_DIR="${DATA_DIR}/input/${EXPERIMENT_ID}"
 
 	mkdir -p "${RESULT_DIR}"
@@ -76,14 +107,16 @@ EOF
 
         export SIMULATE_PETSTORE_OPTS="-Dkieker.monitoring.configuration=${BASE_DIR}/simulate-petstore-kieker.properties"
 
-	${SIMULATOR} -l GERMANY,USA -i 1000000 -d 100 -a $I &
-#	${SIMULATOR} -l GERMANY,USA -i 10000 -d 100 -a $I &
+	${SIMULATE_PETSTORE} -l GERMANY,USA -i $REDEPLOYMENTS -d 100 -a $I &
 	SIMPID[$I]=$!
 	sleep 10
+
+	rm "${BASE_DIR}/simulate-petstore-kieker.properties"
 done
 
+# Stop simulators
 for pid in ${SIMPID[@]}; do
-	echo "wati for $pid"
+	echo "wait for $pid"
 	wait $pid
 done
 

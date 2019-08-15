@@ -1,6 +1,8 @@
 #!/bin/bash
 
-## Read a Kieker log and compute probe response time.
+## Read a Kieker log and compute response times.
+# Requires
+# - CALC_RESPONSE_TIME
 
 # parameter
 # $1 = workload driver configuration (optional)
@@ -23,30 +25,21 @@ checkExecutable calc-response-time $CALC_RESPONSE_TIME
 ##########################
 # parameter
 
-if [ "$1" == "" ] ; then
-	error "Missing model size number"
-	exit
-else
-	RUN="$1"
-fi
-
-if [ "$2" == "" ] ;then
-    error "Missing base directory for probe measurment data"
+if [ "$1" == "" ] ;then
+    error "Missing data set path"
     exit
 else
-    MEASUREMENT_DIR="$2"
+    MEASUREMENT_DIR="$1"
 fi
 
 ###########################
 # setup
 
-PROBE_DIR="${MEASUREMENT_DIR}/$RUN/response-time/"
+checkDirectory response-time-directory "${MEASUREMENT_DIR}"
 
-checkDirectory probe-directory "${PROBE_DIR}"
+KIEKER_DIR_NAME=`ls "${MEASUREMENT_DIR}" | head -1`
 
-KIEKER_DIR_NAME=`ls "${PROBE_DIR}" | head -1`
-
-KIEKER_LOG="${PROBE_DIR}/${KIEKER_DIR_NAME}/"
+KIEKER_LOG="${MEASUREMENT_DIR}/${KIEKER_DIR_NAME}/"
 
 ########################
 # configure
@@ -57,18 +50,20 @@ kieker.monitoring.name=EXP
 kieker.monitoring.hostname=
 kieker.monitoring.metadata=true
 
-# file collector
+# log reader
 kieker.tools.source=kieker.tools.source.LogsReaderCompositeStage
 kieker.tools.source.LogsReaderCompositeStage.logDirectories=${KIEKER_LOG}
 kieker.analysis.source.file.DatEventDeserializer.bufferSize=1000000
 kieker.analysis.source.file.BinaryEventDeserializer.bufferSize=1000000
-org.iobserve.stages.sink.CSVFileWriter.outputFile=${PROBE_DIR}/response-time.csv
+org.iobserve.stages.sink.CSVFileWriter.outputFile=${MEASUREMENT_DIR}/response-time.csv
 EOF
 
-information "Running ${PROBE_DIR}"
+information "Running ${MEASUREMENT_DIR}"
 
-export CALCULATE_RESPONSE_SELENIUM_RESPONSE_TIME_OPTS="-Dlog4j.configuration=file:///$BASE_DIR/log4j-info.cfg"
+export CALCULATE_RESPONSE_TIME_OPTS="-Dlog4j.configuration=file:///$BASE_DIR/log4j-info.cfg"
 ${CALC_RESPONSE_TIME} -c response-time.conf
+
+rm response-time.conf
 
 # end
 
