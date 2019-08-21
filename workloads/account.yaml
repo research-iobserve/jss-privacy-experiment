@@ -7,10 +7,10 @@ webDriverConfiguration:
   driver: /home/reiner/Projects/iObserve/experiments/tools/geckodriver
   timeout: 60000
 workloads:
-  - name: AccountManager
+  - name: CatLoverBehavior
     intensity:
       type: org.iobserve.selenium.configuration.ConstantWorkloadIntensity
-      name: AccountManager
+      name: CatLoverBehavior
       spawnPerSecond: 0.25
       durations: [ 60000 ]
 behaviors:
@@ -53,9 +53,9 @@ behaviors:
     name: CatLoverBehavior
     subbehaviors:
       - name: AddItemsToCartTask
-        repetition: { min: 1, max: 10 }
+        repetition: { min: 1, max: 11 }
         parameters:
-          amount: 9
+          amount: { min: 1, max: 11 }
           item: FL-DSH-01
           category: CATS
       - name: LoginJPetStoreTask
