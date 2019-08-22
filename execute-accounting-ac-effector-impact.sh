@@ -17,7 +17,9 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
+# number of repetitions of requests 
 REPETITIONS=100000
+# how often to log the current number of repetitions
 COUNT=1000
 
 if [ "$1" == "" ] ; then

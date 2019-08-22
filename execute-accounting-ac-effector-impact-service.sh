@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Please note: This script must be started last
+
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 if [ -f $BASE_DIR/config ] ; then
@@ -11,7 +13,9 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
+# number of repetitions of requests 
 REPETITIONS=100000
+# how often to log the current number of repetitions
 COUNT=1000
 
 if [ "$1" == "" ] ; then

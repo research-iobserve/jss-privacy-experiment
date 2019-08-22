@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Please note: This script must be started first
+
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 if [ -f $BASE_DIR/config ] ; then
@@ -11,9 +13,19 @@ fi
 
 . $BASE_DIR/common-functions.sh
 
+# number of repetitions of requests 
 REPETITIONS=100000
+# how often to log the current number of repetitions
 COUNT=1000
+
+# IP address where the account service is running
+# Please note: This must be the IP address the driver shall send its
+# requests to. Do not use the internal docker IP address here as that
+# address is only readchable from the host system
 ACCOUNT_SERVICE="192.168.48.223"
+# IP address where the control service is running
+# Please note: This must be the IP address of the host computer of the
+# account-driver
 CONTROL_SERVICE="192.168.48.225"
 
 if [ "$1" == "" ] ; then
