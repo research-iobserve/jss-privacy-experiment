@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Please note: This script must be started first
+# Before execution make sure the service side does not contain a ac.wait
+# file.
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
