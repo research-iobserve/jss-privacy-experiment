@@ -30,7 +30,7 @@ EXECUTE_ANALYSIS="${BASE_DIR}/execute-analysis-4-resource-monitoring.sh"
 ###################################
 # checks
 
-checkDirectory "executions" "${EXECUTION_DIR}"
+#checkDirectory "executions" "${EXECUTION_DIR}"
 checkExecutable "execute-analysis" "${EXECUTE_ANALYSIS}"
 
 ###################################
