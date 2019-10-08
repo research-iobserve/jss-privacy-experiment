@@ -43,7 +43,7 @@ while [ "$ITERATION" != "10" ] ; do
 		echo "Skipping existing run $ITERATION"
 	else
 		# execute privacy analysis
-		"${EXECUTE_ANALYIS}" "${EXPERIMENT_ID}" "${ITERATION}"
+		"${EXECUTE_ANALYSIS}" "${EXPERIMENT_ID}" "${ITERATION}"
 	fi
 	ITERATION=`expr $ITERATION + 1`
 done
