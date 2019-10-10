@@ -20,8 +20,7 @@ function run_exp() {
         rm -rf "executions/$1"
 }
 
-#for I in ${CONFIG_SET["minor"]} ; do
-for I in 5000 2000 3000 4000 6000 7000 8000 9000 ; do
+for I in ${CONFIG_SET["resource"]} ; do
 	NAME="simulated-account-services-$I"
 	run_exp "$NAME"
 done
